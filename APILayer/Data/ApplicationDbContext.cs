@@ -17,32 +17,35 @@ namespace APILayer.Data
         public DbSet<FAQ> FAQs { get; set; }
         public DbSet<FeaturedAPI> FeaturedAPIs { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<RefreshTokens> RefreshTokens { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             // User Entity Configuration
-            modelBuilder.Entity<User>()
-                .HasKey(u => u.UserId);
-            modelBuilder.Entity<User>()
-                .Property(u => u.Email)
-                .IsRequired();
-            modelBuilder.Entity<User>()
-                .HasIndex(u => u.Email)
-                .IsUnique();
-
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(u => u.Id);
+                entity.Property(u => u.Email).IsRequired();
+                entity.HasIndex(u => u.Email).IsUnique();
+            });
             // API Entity Configuration
-            modelBuilder.Entity<API>()
-                .HasKey(a => a.ApiId);
-            modelBuilder.Entity<API>()
-                .HasOne(a => a.Owner)
-                .WithMany()
-                .HasForeignKey(a => a.OwnerId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<API>(entity =>
+            {
+                entity.HasKey(a => a.Id);
+                entity.Property(a => a.Name).IsRequired();
+                entity.Property(a => a.OwnerId).IsRequired();
+
+                entity.HasOne(a => a.Owner)
+                      .WithMany()
+                      .HasForeignKey(a => a.OwnerId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
 
             // APIDocumentation Entity Configuration
             modelBuilder.Entity<APIDocumentation>()
-                .HasKey(d => d.DocumentationId);
+                .HasKey(d => d.Id);
             modelBuilder.Entity<APIDocumentation>()
                 .HasOne(d => d.Api)
                 .WithMany(a => a.Documentations)
@@ -51,7 +54,7 @@ namespace APILayer.Data
 
             // APIVersion Entity Configuration
             modelBuilder.Entity<APIVersion>()
-                .HasKey(v => v.VersionId);
+                .HasKey(v => v.Id);
             modelBuilder.Entity<APIVersion>()
                 .HasOne(v => v.Api)
                 .WithMany(a => a.Versions)
@@ -60,7 +63,7 @@ namespace APILayer.Data
 
             // Payment Entity Configuration
             modelBuilder.Entity<Payment>()
-                .HasKey(p => p.PaymentId);
+                .HasKey(p => p.Id);
             modelBuilder.Entity<Payment>()
                 .HasOne(p => p.User)
                 .WithMany(u => u.Payments)
@@ -74,7 +77,7 @@ namespace APILayer.Data
 
             // UserSubscription Entity Configuration
             modelBuilder.Entity<UserSubscription>()
-                .HasKey(us => us.SubscriptionId);
+                .HasKey(us => us.Id);
             modelBuilder.Entity<UserSubscription>()
                 .HasOne(us => us.User)
                 .WithMany(u => u.UserSubscriptions)
@@ -100,7 +103,7 @@ namespace APILayer.Data
 
             // FAQ Entity Configuration
             modelBuilder.Entity<FAQ>()
-                .HasKey(f => f.FaqId);
+                .HasKey(f => f.Id);
             modelBuilder.Entity<FAQ>()
                 .HasOne(f => f.User)
                 .WithMany(u => u.FAQs)
@@ -109,7 +112,7 @@ namespace APILayer.Data
 
             // FeaturedAPI Entity Configuration
             modelBuilder.Entity<FeaturedAPI>()
-                .HasKey(fa => fa.FeaturedApiId);
+                .HasKey(fa => fa.Id);
             modelBuilder.Entity<FeaturedAPI>()
                 .HasOne(fa => fa.Api)
                 .WithMany(a => a.FeaturedAPIs)
@@ -123,7 +126,7 @@ namespace APILayer.Data
 
             // Notification Entity Configuration
             modelBuilder.Entity<Notification>()
-                .HasKey(n => n.NotificationId);
+                .HasKey(n => n.Id);
             modelBuilder.Entity<Notification>()
                 .HasOne(n => n.User)
                 .WithMany()
@@ -132,10 +135,26 @@ namespace APILayer.Data
 
             // NewsletterSubscription Entity Configuration
             modelBuilder.Entity<NewsletterSubscription>()
-                .HasKey(ns => ns.SubscriptionId);
+                .HasKey(ns => ns.Id);
             modelBuilder.Entity<NewsletterSubscription>()
                 .HasIndex(ns => ns.Email)
                 .IsUnique();
+
+            // ChatMessage Entity Configuration
+            modelBuilder.Entity<ChatMessage>()
+                .HasKey(cm => cm.Id);
+
+            modelBuilder.Entity<ChatMessage>()
+                .HasOne(cm => cm.Sender)
+                .WithMany()
+                .HasForeignKey(cm => cm.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ChatMessage>()
+                .HasOne(cm => cm.Recipient)
+                .WithMany()
+                .HasForeignKey(cm => cm.RecipientId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
     }

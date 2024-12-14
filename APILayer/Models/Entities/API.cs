@@ -1,10 +1,18 @@
-﻿namespace APILayer.Models.Entities
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace APILayer.Models.Entities
 {
+    [Table("API")]
     public class API
     {
-        public int ApiId { get; set; }
-        public required string OwnerId { get; set; }
-        public required string Name { get; set; }
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        public int OwnerId { get; set; }
+        [Required]
+        [MaxLength(50)]
+        public string? Name { get; set; }
         public string? Description { get; set; }
         public string? Category { get; set;}
         public string? TechnicalSpecs { get; set;}

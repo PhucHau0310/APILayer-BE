@@ -1,10 +1,17 @@
-﻿namespace APILayer.Models.Entities
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace APILayer.Models.Entities
 {
+    [Table("UserSubscription")]
     public class UserSubscription
     {
-        public int SubscriptionId { get; set; }
-        public required string UserId { get; set; }
-        public required int ApiId { get; set; }
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        public int UserId { get; set; }
+        [Required]
+        public int ApiId { get; set; }
         public string? SubscriptionType { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }

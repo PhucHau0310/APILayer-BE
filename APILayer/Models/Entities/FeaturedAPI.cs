@@ -1,10 +1,17 @@
-﻿namespace APILayer.Models.Entities
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace APILayer.Models.Entities
 {
+    [Table("FeaturedAPI")]
     public class FeaturedAPI
     {
-        public int FeaturedApiId { get; set; }
+        [Key]
+        public int Id { get; set; }
+        [Required]
         public int ApiId { get; set; }
-        public required string UserId { get; set; }
+        [Required]
+        public int UserId { get; set; }
         public string? ReasonForFeature { get; set; }
         public DateTime FeaturedFrom { get; set; }
         public DateTime FeaturedTo { get; set; }

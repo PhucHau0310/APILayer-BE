@@ -363,4 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # Ignore appsettings.json
-APILayer/appsettings.json
+**/appsettings.json
+
