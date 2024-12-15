@@ -127,10 +127,17 @@ namespace APILayer.Data
             // Notification Entity Configuration
             modelBuilder.Entity<Notification>()
                 .HasKey(n => n.Id);
+
             modelBuilder.Entity<Notification>()
-                .HasOne(n => n.User)
+                .HasOne(cm => cm.Sender)
                 .WithMany()
-                .HasForeignKey(n => n.UserId)
+                .HasForeignKey(cm => cm.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(cm => cm.Receiver)
+                .WithMany()
+                .HasForeignKey(cm => cm.ReceiverId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // NewsletterSubscription Entity Configuration

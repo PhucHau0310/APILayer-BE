@@ -8,16 +8,20 @@ namespace APILayer.Models.Entities
     {
         [Key]
         public int Id { get; set; }
-        public int UserId { get; set; } // NULL nếu là thông báo toàn hệ thống
-        [Required]
-        public string? Title { get; set; }
-        [Required]
         public string? Message { get; set; }
-        public string? Type { get; set; } // info, warning, success, error
-        public bool IsRead { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public bool? IsRead { get; set; } = false;
+        public DateTime? CreatedAt { get; set; } = DateTime.Now;
 
-        // Relationships
-        public User? User { get; set; }
+        [Required]
+        public int SenderId { get; set; }
+
+        [ForeignKey("SenderId")]
+        public User? Sender { get; set; }
+
+        [Required]
+        public int ReceiverId { get; set; }
+
+        [ForeignKey("ReceiverId")]
+        public User? Receiver { get; set; }
     }
 }
