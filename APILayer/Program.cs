@@ -75,7 +75,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("https://localhost:7036", "http://localhost:7036")
+        policy.WithOrigins("https://localhost:7036", "http://localhost:7036", "http://localhost:3000")
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -167,6 +167,7 @@ app.UseEndpoints(endpoints =>
     {
         context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:5173");
         context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:5174");
+        context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000");
         context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
         context.Response.StatusCode = 200;

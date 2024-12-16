@@ -101,7 +101,6 @@ namespace APILayer.Controllers
             });
         }
 
-
         [HttpGet("history")]
         public async Task<IActionResult> GetChatHistory(string user1, string user2)
         {
