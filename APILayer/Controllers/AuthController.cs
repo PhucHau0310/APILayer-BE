@@ -43,13 +43,35 @@ namespace APILayer.Controllers
                 });
             }
 
+            var existingUsernameCheck = await _context.Users.AnyAsync(u => u.Username == registerReq.Username);
+            if (existingUsernameCheck)
+            {
+                return BadRequest(new Response<string>
+                {
+                    Success = false,
+                    Message = "Username already taken.",
+                    Data = null
+                });
+            }
+
+            var existingEmailCheck = await _context.Users.AnyAsync(u => u.Email == registerReq.Email);
+            if (existingEmailCheck)
+            {
+                return BadRequest(new Response<string>
+                {
+                    Success = false,
+                    Message = "Email already in use.",
+                    Data = null
+                });
+            }
+
             var result = await _userService.RegisterUserAsync(registerReq);
             if (!result)
             {
                 return BadRequest(new Response<string>
                 {
                     Success = false,
-                    Message = "Username is already taken.",
+                    Message = "Registration failed.",
                     Data = null
                 });
             }

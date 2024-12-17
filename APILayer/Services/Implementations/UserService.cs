@@ -22,11 +22,18 @@ namespace APILayer.Services.Implementations
 
         public async Task<bool> RegisterUserAsync(RegisterReq registerReq)
         {
-            var existingUser = await _context.Users.SingleOrDefaultAsync(u => 
-                                u.Username == registerReq.Username
-                                && u.Email == registerReq.Email);
+            var existingUsername = await _context.Users.SingleOrDefaultAsync(u => 
+                                u.Username == registerReq.Username);
 
-            if (existingUser != null)
+            if (existingUsername != null)
+            {
+                return false;
+            }
+
+            var existingEmail = await _context.Users.SingleOrDefaultAsync(u =>
+                       u.Email == registerReq.Email);
+
+            if (existingEmail != null)
             {
                 return false;
             }
