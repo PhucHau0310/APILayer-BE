@@ -41,6 +41,12 @@
             "/graphql",
             "/api/paypal",
 
+            // API 
+            "/api/api/documentation",
+            "/api/api/documentation/{id}", // Để người dùng có thể xem docs
+            "/api/api/version", // Để người dùng có thể xem versions
+            "/api/api/version/{id}"
+
         };
 
         public static readonly string[] AdminEndpoints =
@@ -55,6 +61,16 @@
 
             // FAQ
             "/api/faq/get-faqs",
+
+             // API 
+            "/api/api",
+            "/api/api/{id}",
+            // Documentation
+            "/api/api/documentation",
+            "/api/api/documentation/{id}",
+            // Version
+            "/api/api/version",
+            "/api/api/version/{id}"
         };
 
         public static readonly string[] CustomerEndpoints =
@@ -74,6 +90,16 @@
             "/api/stripe/create-payment-intent",
             "/api/stripe/webhook",
             "/api/paypal/create-order",
+
+            // API Management endpoints
+            "/api/api",
+            "/api/api/{id}",
+            // Documentation
+            "/api/api/documentation",
+            "/api/api/documentation/{id}",
+            // Version  
+            "/api/api/version",
+            "/api/api/version/{id}"
         };
     }
 }
