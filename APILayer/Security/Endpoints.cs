@@ -16,11 +16,19 @@
             "/api/user/forgot-password",
             "/api/user/verify-code",
             "/api/user/reset-password",
+            "/api/user/get-user-by-name",
 
             // ChatController
             "/api/chat/history",
             "/api/chat/send",
             "/api/chat/get-conversations",
+
+            // FAQ
+            "/api/faq/get-faq-by-id",
+            "/api/faq/get-faq-by-userId",
+            "/api/faq/create-faq",
+            "/api/faq/update-faq",
+            "/api/faq/delete-faq",
 
             // SignalR
             "/chathub",
@@ -44,6 +52,9 @@
 
             // ChatController
             "/api/chat/sendAll",
+
+            // FAQ
+            "/api/faq/get-faqs",
         };
 
         public static readonly string[] CustomerEndpoints =
@@ -57,6 +68,7 @@
 
         public static readonly string[] ProviderEndpoints =
         {
+            
             "/api/chat/send",
             "/api/chat/history",
             "/api/stripe/create-payment-intent",
