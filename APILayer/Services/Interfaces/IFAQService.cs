@@ -1,4 +1,5 @@
-﻿using APILayer.Models.Entities;
+﻿using APILayer.Models.DTOs.Req;
+using APILayer.Models.Entities;
 
 namespace APILayer.Services.Interfaces
 {
@@ -7,8 +8,8 @@ namespace APILayer.Services.Interfaces
         Task<IEnumerable<FAQ>> GetAllFAQsAsync();
         Task<FAQ?> GetFAQByIdAsync(int id);
         Task<IEnumerable<FAQ>> GetFAQsByUserIdAsync(int userId);
-        Task<FAQ> CreateFAQAsync(FAQ faq);
-        Task<FAQ?> UpdateFAQAsync(int id, FAQ faq);
+        Task<FAQ> CreateFAQAsync(FAQReq faqReq);
+        Task<FAQ?> UpdateFAQAsync(int id, FAQReq faqReq);
         Task<bool> DeleteFAQAsync(int id);
     }
 }
