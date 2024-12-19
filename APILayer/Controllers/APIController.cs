@@ -13,12 +13,17 @@ namespace APILayer.Controllers
         private readonly IAPIService _apiService;
         private readonly IAPIDocumentationService _documentationService;
         private readonly IAPIVersionService _versionService;
+        private readonly IFeaturedAPIService _featuredAPIService;
 
-        public APIController(IAPIService apiService, IAPIDocumentationService documentationService, IAPIVersionService versionService)
+        public APIController(IAPIService apiService, 
+            IAPIDocumentationService documentationService, 
+            IAPIVersionService versionService, 
+            IFeaturedAPIService featuredAPIService)
         {
             _apiService = apiService;
             _documentationService = documentationService;
             _versionService = versionService;
+            _featuredAPIService = featuredAPIService;
         }
 
         [HttpGet]
@@ -451,6 +456,197 @@ namespace APILayer.Controllers
                 {
                     Success = false,
                     Message = $"An error occurred while deleting version: {ex.Message}"
+                });
+            }
+        }
+        
+        // Featured endpoints
+        [HttpGet("featured")]
+        public async Task<ActionResult<Response<IEnumerable<FeaturedAPI>>>> GetAllFeaturedAPIs()
+        {
+            try
+            {
+                var featuredAPIs = await _featuredAPIService.GetAllFeaturedAPIsAsync();
+                return Ok(new Response<IEnumerable<FeaturedAPI>>
+                {
+                    Success = true,
+                    Message = "Featured APIs retrieved successfully",
+                    Data = featuredAPIs
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new Response<IEnumerable<FeaturedAPI>>
+                {
+                    Success = false,
+                    Message = $"An error occurred while retrieving featured APIs: {ex.Message}"
+                });
+            }
+        }
+
+        [HttpGet("featured/current")]
+        public async Task<ActionResult<Response<IEnumerable<FeaturedAPI>>>> GetCurrentFeaturedAPIs()
+        {
+            try
+            {
+                var featuredAPIs = await _featuredAPIService.GetCurrentFeaturedAPIsAsync();
+                return Ok(new Response<IEnumerable<FeaturedAPI>>
+                {
+                    Success = true,
+                    Message = "Current featured APIs retrieved successfully",
+                    Data = featuredAPIs
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new Response<IEnumerable<FeaturedAPI>>
+                {
+                    Success = false,
+                    Message = $"An error occurred while retrieving current featured APIs: {ex.Message}"
+                });
+            }
+        }
+
+        [HttpGet("featured/{id}")]
+        public async Task<ActionResult<Response<FeaturedAPI>>> GetFeaturedAPIById(int id)
+        {
+            try
+            {
+                var featuredAPI = await _featuredAPIService.GetFeaturedAPIByIdAsync(id);
+                if (featuredAPI == null)
+                {
+                    return NotFound(new Response<FeaturedAPI>
+                    {
+                        Success = false,
+                        Message = $"Featured API with ID {id} not found"
+                    });
+                }
+
+                return Ok(new Response<FeaturedAPI>
+                {
+                    Success = true,
+                    Message = "Featured API retrieved successfully",
+                    Data = featuredAPI
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new Response<FeaturedAPI>
+                {
+                    Success = false,
+                    Message = $"An error occurred while retrieving featured API: {ex.Message}"
+                });
+            }
+        }
+
+        [HttpGet("featured/user/{userId}")]
+        public async Task<ActionResult<Response<IEnumerable<FeaturedAPI>>>> GetFeaturedAPIsByUserId(int userId)
+        {
+            try
+            {
+                var featuredAPIs = await _featuredAPIService.GetFeaturedAPIsByUserIdAsync(userId);
+                return Ok(new Response<IEnumerable<FeaturedAPI>>
+                {
+                    Success = true,
+                    Message = "Featured APIs for user retrieved successfully",
+                    Data = featuredAPIs
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new Response<IEnumerable<FeaturedAPI>>
+                {
+                    Success = false,
+                    Message = $"An error occurred while retrieving featured APIs for user: {ex.Message}"
+                });
+            }
+        }
+
+        [HttpPost("featured")]
+        public async Task<ActionResult<Response<FeaturedAPI>>> CreateFeaturedAPI([FromBody] FeaturedAPI featuredAPI)
+        {
+            try
+            {
+                var createdFeaturedAPI = await _featuredAPIService.CreateFeaturedAPIAsync(featuredAPI);
+                return CreatedAtAction(nameof(GetFeaturedAPIById),
+                    new { id = createdFeaturedAPI.Id },
+                    new Response<FeaturedAPI>
+                    {
+                        Success = true,
+                        Message = "Featured API created successfully",
+                        Data = createdFeaturedAPI
+                    });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new Response<FeaturedAPI>
+                {
+                    Success = false,
+                    Message = $"An error occurred while creating featured API: {ex.Message}"
+                });
+            }
+        }
+
+        [HttpPut("featured/{id}")]
+        public async Task<ActionResult<Response<FeaturedAPI>>> UpdateFeaturedAPI(int id, [FromBody] FeaturedAPI featuredAPI)
+        {
+            try
+            {
+                var updatedFeaturedAPI = await _featuredAPIService.UpdateFeaturedAPIAsync(id, featuredAPI);
+                if (updatedFeaturedAPI == null)
+                {
+                    return NotFound(new Response<FeaturedAPI>
+                    {
+                        Success = false,
+                        Message = $"Featured API with ID {id} not found"
+                    });
+                }
+
+                return Ok(new Response<FeaturedAPI>
+                {
+                    Success = true,
+                    Message = "Featured API updated successfully",
+                    Data = updatedFeaturedAPI
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new Response<FeaturedAPI>
+                {
+                    Success = false,
+                    Message = $"An error occurred while updating featured API: {ex.Message}"
+                });
+            }
+        }
+
+        [HttpDelete("featured/{id}")]
+        public async Task<ActionResult<Response<bool>>> DeleteFeaturedAPI(int id)
+        {
+            try
+            {
+                var success = await _featuredAPIService.DeleteFeaturedAPIAsync(id);
+                if (!success)
+                {
+                    return NotFound(new Response<bool>
+                    {
+                        Success = false,
+                        Message = $"Featured API with ID {id} not found"
+                    });
+                }
+
+                return Ok(new Response<bool>
+                {
+                    Success = true,
+                    Message = "Featured API deleted successfully",
+                    Data = true
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new Response<bool>
+                {
+                    Success = false,
+                    Message = $"An error occurred while deleting featured API: {ex.Message}"
                 });
             }
         }

@@ -100,6 +100,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IFAQService, FAQService>();
+builder.Services.AddScoped<IAPIService, APIService>();
+builder.Services.AddScoped<IAPIDocumentationService, APIDocumentationService>();
+builder.Services.AddScoped<IAPIVersionService, APIVersionService>();
+builder.Services.AddScoped<IFeaturedAPIService, FeaturedAPIService>();
 
 // Configure Entity Framework
 builder.Services.AddDbContext<ApplicationDbContext>
