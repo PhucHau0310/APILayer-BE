@@ -1,4 +1,5 @@
-﻿using APILayer.Models.DTOs.Res;
+﻿using APILayer.Models.DTOs.Req;
+using APILayer.Models.DTOs.Res;
 using APILayer.Models.Entities;
 using APILayer.Services.Implementations;
 using APILayer.Services.Interfaces;
@@ -107,7 +108,7 @@ namespace APILayer.Controllers
         }
 
         [HttpPost("create-faq")]
-        public async Task<IActionResult> CreateFAQ([FromBody] FAQ faq)
+        public async Task<IActionResult> CreateFAQ([FromBody] FAQReq faqReq)
         {
             if (!ModelState.IsValid)
             {
@@ -121,7 +122,7 @@ namespace APILayer.Controllers
 
             try
             {
-                var createdFAQ = await _faqService.CreateFAQAsync(faq);
+                var createdFAQ = await _faqService.CreateFAQAsync(faqReq);
                 return CreatedAtAction(nameof(GetFAQById), new { id = createdFAQ.Id }, new Response<FAQ>
                 {
                     Success = true,
@@ -141,7 +142,7 @@ namespace APILayer.Controllers
         }
 
         [HttpPut("update-faq")]
-        public async Task<IActionResult> UpdateFAQ(int id, [FromBody] FAQ faq)
+        public async Task<IActionResult> UpdateFAQ(int id, [FromBody] FAQReq faqReq)
         {
             if (!ModelState.IsValid)
             {
@@ -155,7 +156,7 @@ namespace APILayer.Controllers
 
             try
             {
-                var updatedFAQ = await _faqService.UpdateFAQAsync(id, faq);
+                var updatedFAQ = await _faqService.UpdateFAQAsync(id, faqReq);
                 if (updatedFAQ == null)
                 {
                     return NotFound(new Response<string>

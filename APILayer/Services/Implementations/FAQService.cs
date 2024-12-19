@@ -1,4 +1,5 @@
 ﻿using APILayer.Data;
+using APILayer.Models.DTOs.Req;
 using APILayer.Models.Entities;
 using APILayer.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -30,22 +31,30 @@ namespace APILayer.Services.Implementations
             return await _context.FAQs.Where(f => f.UserId == userId).ToListAsync();
         }
 
-        public async Task<FAQ> CreateFAQAsync(FAQ faq)
+        public async Task<FAQ> CreateFAQAsync(FAQReq faqReq)
         {
-            _context.FAQs.Add(faq);
+            var newFAQ = new FAQ
+            {
+                Question = faqReq.Question,
+                Answer = faqReq.Answer,
+                Category = faqReq.Category,
+                UserId = faqReq.UserId
+            };
+
+            _context.FAQs.Add(newFAQ);
             await _context.SaveChangesAsync();
-            return faq;
+            return newFAQ;
         }
 
-        public async Task<FAQ?> UpdateFAQAsync(int id, FAQ faq)
+        public async Task<FAQ?> UpdateFAQAsync(int id, FAQReq faqReq)
         {
             var existingFAQ = await _context.FAQs.FindAsync(id);
             if (existingFAQ == null) return null;
 
-            existingFAQ.Question = faq.Question;
-            existingFAQ.Answer = faq.Answer;
-            existingFAQ.Category = faq.Category;
-            existingFAQ.UserId = faq.UserId;
+            existingFAQ.Question = faqReq.Question;
+            existingFAQ.Answer = faqReq.Answer;
+            existingFAQ.Category = faqReq.Category;
+            existingFAQ.UserId = faqReq.UserId;
 
             await _context.SaveChangesAsync();
             return existingFAQ;
