@@ -171,7 +171,7 @@ namespace APILayer.Controllers
         {
             try
             {
-                var docs = await _documentationService.GetAllDocumentationsAsync();
+                var docs = await _apiService.GetAllDocumentationsAsync();
                 return Ok(new Response<IEnumerable<APIDocumentation>>
                 {
                     Success = true,
@@ -194,7 +194,7 @@ namespace APILayer.Controllers
         {
             try
             {
-                var documentation = await _documentationService.GetDocumentationByIdAsync(id);
+                var documentation = await _apiService.GetDocumentationByIdAsync(id);
                 if (documentation == null)
                 {
                     return NotFound(new Response<APIDocumentation>
@@ -226,7 +226,7 @@ namespace APILayer.Controllers
         {
             try
             {
-                var createdDoc = await _documentationService.CreateDocumentationAsync(documentation);
+                var createdDoc = await _apiService.CreateDocumentationAsync(documentation);
                 return CreatedAtAction(nameof(GetDocumentationById),
                     new { id = createdDoc.Id },
                     new Response<APIDocumentation>
@@ -251,7 +251,7 @@ namespace APILayer.Controllers
         {
             try
             {
-                var documentation = await _documentationService.UpdateDocumentationAsync(id, updatedDoc);
+                var documentation = await _apiService.UpdateDocumentationAsync(id, updatedDoc);
                 if (documentation == null)
                 {
                     return NotFound(new Response<APIDocumentation>
@@ -283,7 +283,7 @@ namespace APILayer.Controllers
         {
             try
             {
-                var success = await _documentationService.DeleteDocumentationAsync(id);
+                var success = await _apiService.DeleteDocumentationAsync(id);
                 if (!success)
                 {
                     return NotFound(new Response<bool>
@@ -316,7 +316,7 @@ namespace APILayer.Controllers
         {
             try
             {
-                var versions = await _versionService.GetAllVersionsAsync();
+                var versions = await _apiService.GetAllVersionsAsync();
                 return Ok(new Response<IEnumerable<APIVersion>>
                 {
                     Success = true,
@@ -339,7 +339,7 @@ namespace APILayer.Controllers
         {
             try
             {
-                var version = await _versionService.GetVersionByIdAsync(id);
+                var version = await _apiService.GetVersionByIdAsync(id);
                 if (version == null)
                 {
                     return NotFound(new Response<APIVersion>
@@ -371,7 +371,7 @@ namespace APILayer.Controllers
         {
             try
             {
-                var createdVersion = await _versionService.CreateVersionAsync(version);
+                var createdVersion = await _apiService.CreateVersionAsync(version);
                 return CreatedAtAction(nameof(GetVersionById),
                     new { id = createdVersion.Id },
                     new Response<APIVersion>
@@ -396,7 +396,7 @@ namespace APILayer.Controllers
         {
             try
             {
-                var version = await _versionService.UpdateVersionAsync(id, updatedVersion);
+                var version = await _apiService.UpdateVersionAsync(id, updatedVersion);
                 if (version == null)
                 {
                     return NotFound(new Response<APIVersion>
@@ -428,7 +428,7 @@ namespace APILayer.Controllers
         {
             try
             {
-                var success = await _versionService.DeleteVersionAsync(id);
+                var success = await _apiService.DeleteVersionAsync(id);
                 if (!success)
                 {
                     return NotFound(new Response<bool>
