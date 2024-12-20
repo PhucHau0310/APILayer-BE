@@ -11,21 +11,16 @@ namespace APILayer.Controllers
     public class APIController : ControllerBase
     {
         private readonly IAPIService _apiService;
-        private readonly IAPIDocumentationService _documentationService;
-        private readonly IAPIVersionService _versionService;
         private readonly IFeaturedAPIService _featuredAPIService;
 
         public APIController(IAPIService apiService, 
-            IAPIDocumentationService documentationService, 
-            IAPIVersionService versionService, 
             IFeaturedAPIService featuredAPIService)
         {
             _apiService = apiService;
-            _documentationService = documentationService;
-            _versionService = versionService;
             _featuredAPIService = featuredAPIService;
         }
 
+        // API endpoints
         [HttpGet]
         public async Task<ActionResult<Response<IEnumerable<API>>>> GetAllAPIs()
         {

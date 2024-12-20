@@ -24,11 +24,18 @@
             "/api/chat/get-conversations",
 
             // FAQ
+            "/api/faq/get-faqs",
             "/api/faq/get-faq-by-id",
             "/api/faq/get-faq-by-userId",
             "/api/faq/create-faq",
             "/api/faq/update-faq",
             "/api/faq/delete-faq",
+
+            // API 
+            "/api/api/documentation",
+            "/api/api/documentation/{id}", // Để người dùng có thể xem docs
+            "/api/api/version", // Để người dùng có thể xem versions
+            "/api/api/version/{id}",
 
             // SignalR
             "/chathub",
@@ -40,13 +47,6 @@
             "/api/img",
             "/graphql",
             "/api/paypal",
-
-            // API 
-            "/api/api/documentation",
-            "/api/api/documentation/{id}", // Để người dùng có thể xem docs
-            "/api/api/version", // Để người dùng có thể xem versions
-            "/api/api/version/{id}"
-
         };
 
         public static readonly string[] AdminEndpoints =
@@ -58,9 +58,6 @@
 
             // ChatController
             "/api/chat/sendAll",
-
-            // FAQ
-            "/api/faq/get-faqs",
 
              // API 
             "/api/api",

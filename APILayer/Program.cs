@@ -101,8 +101,6 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IFAQService, FAQService>();
 builder.Services.AddScoped<IAPIService, APIService>();
-builder.Services.AddScoped<IAPIDocumentationService, APIDocumentationService>();
-builder.Services.AddScoped<IAPIVersionService, APIVersionService>();
 builder.Services.AddScoped<IFeaturedAPIService, FeaturedAPIService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 
