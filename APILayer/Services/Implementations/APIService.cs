@@ -1,4 +1,5 @@
-﻿using APILayer.Models.Entities;
+﻿using APILayer.Data;
+using APILayer.Models.Entities;
 using APILayer.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,9 +7,9 @@ namespace APILayer.Services.Implementations
 {
     public class APIService : IAPIService
     {
-        private readonly DbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public APIService(DbContext context)
+        public APIService(ApplicationDbContext context)
         {
             _context = context;
         }
