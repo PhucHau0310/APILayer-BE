@@ -62,28 +62,48 @@
              // API 
             "/api/api",
             "/api/api/{id}",
+
             // Documentation
             "/api/api/documentation",
             "/api/api/documentation/{id}",
+
             // Version
             "/api/api/version",
-            "/api/api/version/{id}"
+            "/api/api/version/{id}",
+
+            // Chat
+            "/api/chat/get-conversations/{username}",
+
+            // Notification
+            "/api/notification/send",
+            "/api/notification/send-many",
+            "/api/notification/{username}",
+            "/api/notification/detail/{id}",
+            "/api/notification/{id}",
         };
 
         public static readonly string[] CustomerEndpoints =
         {
+            // Chat
             "/api/chat/send",
             "/api/chat/history",
+
+            // Others
             "/api/stripe/create-payment-intent",
             "/api/stripe/webhook",
             "/api/paypal/create-order",
+
+            //Notification
+            "/api/notification/{id}/read",
+            "/api/notification/unread/{username}",
         };
 
         public static readonly string[] ProviderEndpoints =
         {
-            
+            // Chat
             "/api/chat/send",
             "/api/chat/history",
+
             "/api/stripe/create-payment-intent",
             "/api/stripe/webhook",
             "/api/paypal/create-order",
@@ -91,12 +111,18 @@
             // API Management endpoints
             "/api/api",
             "/api/api/{id}",
+
             // Documentation
             "/api/api/documentation",
             "/api/api/documentation/{id}",
+
             // Version  
             "/api/api/version",
-            "/api/api/version/{id}"
+            "/api/api/version/{id}",
+
+             //Notification
+            "/api/notification/{id}/read",
+            "/api/notification/unread/{username}",
         };
     }
 }

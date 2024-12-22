@@ -1,14 +1,7 @@
-﻿using APILayer.Data;
-using APILayer.Hubs;
-using APILayer.Models.DTOs.Req;
-using APILayer.Models.DTOs.Res;
+﻿using APILayer.Models.DTOs.Req;
 using APILayer.Models.Entities;
 using APILayer.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace APILayer.Controllers
 {
@@ -16,27 +9,13 @@ namespace APILayer.Controllers
     [ApiController]
     public class ChatController : ControllerBase
     {
-        private readonly IHubContext<ChatHub> _chatHub;
         private readonly IUserService _userService;
-        private readonly ApplicationDbContext _context;
+        private readonly IChatService _chatService;
 
-        public ChatController(IHubContext<ChatHub> chatHub, IUserService userService, ApplicationDbContext dbContext)
+        public ChatController(IUserService userService, IChatService chatService)
         {
-            _chatHub = chatHub;
+            _chatService = chatService;
             _userService = userService;
-            _context = dbContext;
-        }
-
-        [HttpPost("sendAll")]
-        public async Task<IActionResult> SendMessage(string user, string message)
-        {
-            await _chatHub.Clients.All.SendAsync("ReceiveMessage", user, message);
-            return Ok(new Response<string>
-            {
-                Success = true,
-                Message = "Message sent",
-                Data = null
-            });
         }
 
         [HttpPost("send")]
@@ -58,38 +37,7 @@ namespace APILayer.Controllers
                 Timestamp = DateTime.UtcNow
             };
 
-            _context.ChatMessages.Add(chatMsg);
-            await _context.SaveChangesAsync();
-
-            // Retrieve connection IDs for both sender and recipient
-            var senderConnection = ChatHub.GetConnectionId(chatMessage.Sender);
-            var recipientConnection = ChatHub.GetConnectionId(chatMessage.Recipient);
-
-            // Send message to the sender if they are connected
-            if (senderConnection != null)
-            {
-                await _chatHub.Clients.Client(senderConnection).SendAsync("ReceiveMessage", new
-                {
-                    id = chatMsg.Id,
-                    sender = chatMessage.Sender,
-                    recipient = chatMessage.Recipient,
-                    message = chatMessage.Message,
-                    timestamp = chatMsg.Timestamp
-                });
-            }
-
-            // Send message to the recipient if they are connected
-            if (recipientConnection != null)
-            {
-                await _chatHub.Clients.Client(recipientConnection).SendAsync("ReceiveMessage", new
-                {
-                    id = chatMsg.Id,
-                    sender = chatMessage.Sender,
-                    recipient = chatMessage.Recipient,
-                    message = chatMessage.Message,
-                    timestamp = chatMsg.Timestamp
-                });
-            }
+            await _chatService.CreateMessageAsync(chatMsg);
 
             return Ok(new
             {
@@ -104,21 +52,13 @@ namespace APILayer.Controllers
         [HttpGet("history")]
         public async Task<IActionResult> GetChatHistory(string user1, string user2)
         {
-            var user1Entity = await _context.Users.FirstOrDefaultAsync(u => u.Username == user1);
-            var user2Entity = await _context.Users.FirstOrDefaultAsync(u => u.Username == user2);
+            var user1Entity = await _userService.GetUserByUsername(user1);
+            var user2Entity = await _userService.GetUserByUsername(user2);
+
             if (user1Entity == null || user2Entity == null)
                 return BadRequest("Invalid users");
 
-            // Fetch messages where either user is sender and the other is recipient
-            var user1Id = user1Entity.Id;
-            var user2Id = user2Entity.Id;
-
-            var messages = await _context.ChatMessages
-                .Where(m => (m.SenderId == user1Id && m.RecipientId == user2Id) ||
-                            (m.SenderId == user2Id && m.RecipientId == user1Id))
-                .OrderBy(m => m.Timestamp)
-                .ToListAsync();
-
+            var messages = await _chatService.GetChatHistoryAsync(user1Entity.Id, user2Entity.Id);
             return Ok(messages);
         }
 
@@ -129,23 +69,7 @@ namespace APILayer.Controllers
             if (user == null)
                 return NotFound("User not found");
 
-            var messages = await _context.ChatMessages
-                .Include(m => m.Sender)
-                .Include(m => m.Recipient)
-                .Where(m => m.Sender.Username == username || m.Recipient.Username == username)
-                .ToListAsync();
-
-            var conversations = messages
-                .GroupBy(m => m.Sender.Username == username ? m.Recipient : m.Sender)
-                .Select(group => new
-                {
-                    userId = group.Key.Id,
-                    name = group.Key.Username,
-                    lastMessage = group.OrderByDescending(m => m.Timestamp).FirstOrDefault()?.Message,
-                    lastMessageTime = group.OrderByDescending(m => m.Timestamp).FirstOrDefault()?.Timestamp
-                })
-                .ToList();
-
+            var conversations = await _chatService.GetChatHistoryByUserIdAsync(user.Id);
             return Ok(conversations);
         }
     }

@@ -9,33 +9,60 @@ namespace APILayer.Hubs
 {
     public class NotificationHub : Hub
     {
-        private readonly INotificationService _notificationService;
         private readonly IUserService _userService;
         private readonly ApplicationDbContext _context;
         private static readonly Dictionary<string, string> _userConnections = new();
 
         public NotificationHub(
-            INotificationService notificationService,
             IUserService userService,
             ApplicationDbContext context)
         {
-            _notificationService = notificationService;
             _userService = userService;
             _context = context;
+        }
+
+        /// Handles client connection
+        public override Task OnConnectedAsync()
+        {
+            var userId = Context.User?.Identity?.Name;
+            Console.WriteLine("Userid is " + userId);
+            if (userId != null)
+            {
+                _userConnections[userId] = Context.ConnectionId;
+            }
+            return base.OnConnectedAsync();
+        }
+
+        /// Handles client disconnection
+        public override Task OnDisconnectedAsync(Exception? exception)
+        {
+            var userId = Context.User?.Identity?.Name;
+            if (userId != null)
+            {
+                _userConnections.Remove(userId);
+            }
+            return base.OnDisconnectedAsync(exception);
+        }
+
+        public static string? GetConnectionId(string username)
+        {
+            return _userConnections.TryGetValue(username, out var connectionId) ? connectionId : null;
         }
 
         /// <summary>
         /// Sends a notification to a specific user
         /// </summary>
-        public async Task SendNotification(string sender, string recipientId, string message)
+        public async Task SendNotification(string sender, string recipient, string message)
         {
-            var senderId = _userService.GetUserByUsername(sender).Id;
-            if (senderId == null || string.IsNullOrEmpty(recipientId)) return;
+            var senderId = _userService.GetUserByUsername(sender)?.Id;
+            var recipientId = _userService.GetUserByUsername(recipient)?.Id;
+
+            if (senderId == null || recipientId == null) return;
 
             var notification = new Notification
             {
-                SenderId = senderId,
-                ReceiverId = int.Parse(recipientId),
+                SenderId = (int)senderId,
+                ReceiverId = (int)recipientId,
                 Message = message,
                 CreatedAt = DateTime.UtcNow
             };
@@ -44,7 +71,7 @@ namespace APILayer.Hubs
             await _context.SaveChangesAsync();
 
             // Notify only the specific recipient
-            if (_userConnections.TryGetValue(recipientId, out var recipientConnectionId))
+            if (_userConnections.TryGetValue(recipient, out var recipientConnectionId))
             {
                 await Clients.Client(recipientConnectionId).SendAsync("ReceiveNotification", new
                 {
@@ -92,39 +119,6 @@ namespace APILayer.Hubs
                 .Where(n => n.SenderId == user.Id && n.IsRead == false)
                 .OrderByDescending(n => n.CreatedAt)
                 .ToListAsync();
-        }
-
-        private string IdentityName
-        {
-            get { return Context.User.Identity.Name; }
-        }
-
-        /// Handles client connection
-        public override Task OnConnectedAsync()
-        {
-            var userId = Context.User.Identity.Name;
-            Console.WriteLine("Userid is " + userId);
-            if (userId != null)
-            {
-                _userConnections[userId] = Context.ConnectionId;
-            }
-            return base.OnConnectedAsync();
-        }
-
-        /// Handles client disconnection
-        public override Task OnDisconnectedAsync(Exception? exception)
-        {
-            var userId = Context.User?.Identity?.Name;
-            if (userId != null)
-            {
-                _userConnections.Remove(userId);
-            }
-            return base.OnDisconnectedAsync(exception);
-        }
-
-        public static string? GetConnectionId(string username)
-        {
-            return _userConnections.TryGetValue(username, out var connectionId) ? connectionId : null;
         }
     }
 }

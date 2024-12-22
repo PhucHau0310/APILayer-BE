@@ -99,6 +99,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IFAQService, FAQService>();
 builder.Services.AddScoped<IAPIService, APIService>();
 builder.Services.AddScoped<IFeaturedAPIService, FeaturedAPIService>();
