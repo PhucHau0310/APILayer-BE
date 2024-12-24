@@ -11,6 +11,8 @@
             "/api/auth/refresh-token",
             "/api/auth/signin-google",
             "/api/auth/google-response",
+            "/signin-google",  // Add this
+            "/google-response",
 
             // UserController
             "/api/user/forgot-password",

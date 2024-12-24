@@ -65,6 +65,7 @@ namespace APILayer.Services.Implementations
 
             return true;
         }
+
         public async Task<bool> ForgotPassword(string mail)
         {
             var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == mail);

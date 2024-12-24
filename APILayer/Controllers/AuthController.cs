@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using APILayer.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Principal;
 
 namespace APILayer.Controllers
 {
@@ -161,16 +164,9 @@ namespace APILayer.Controllers
         [HttpGet("signin-google")]
         public IActionResult SignInWithGoogle(string role = "Customer")
         {
-            //var redirectUrl = Url.Action("GoogleResponse", "GoogleLogin", new { role });
-            //var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
-            //return Challenge(properties, "Google");
-
             try
             {
-                // Log the incoming request details
-                Console.WriteLine($"Google Sign-In initiated with role: {role}");
-
-                var redirectUrl = Url.Action("GoogleResponse", "Auth", new { role }, Request.Scheme);
+                var redirectUrl = Url.Action("GoogleResponse", "Auth", new {role});
 
                 // Log the redirect URL
                 Console.WriteLine($"Redirect URL: {redirectUrl}");
@@ -178,11 +174,16 @@ namespace APILayer.Controllers
                 var properties = new AuthenticationProperties
                 {
                     RedirectUri = redirectUrl,
-                    // Add additional properties like saving the role
-                    Items = { { "role", role } }
+                    Items =
+                    {
+                         { "role", role } 
+                        //{ "LoginProvider", "Google" }
+                    },
+                    AllowRefresh = true
                 };
 
-                return Challenge(properties, "Google");
+                //return Challenge(properties, "Google");
+                return Challenge(properties, GoogleDefaults.AuthenticationScheme);
             }
             catch (Exception ex)
             {
@@ -199,12 +200,17 @@ namespace APILayer.Controllers
             }
         }
 
-        [Authorize(AuthenticationSchemes = "Google")]
+        //[Authorize(AuthenticationSchemes = "Google")]
+        [Authorize(AuthenticationSchemes = GoogleDefaults.AuthenticationScheme)]
         [HttpGet("google-response")]
         public async Task<IActionResult> GoogleResponse(string state)
         {
-            string role = state;
-            var result = await HttpContext.AuthenticateAsync("Google");
+            // Lấy thông tin role từ AuthenticationProperties
+            var role = HttpContext.Request.Query["state"];
+            //string role = state;
+            Console.WriteLine($"{state} {role}");
+            //var result = await HttpContext.AuthenticateAsync("Google");
+            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
             Console.WriteLine("suc: " + result.Succeeded);
             if (result.Succeeded)
             {
@@ -236,7 +242,7 @@ namespace APILayer.Controllers
                 var regis = new RegisterReq
                 {
                     Username = googleEmail,
-                    Password = "123456789",
+                    Password = "123456",
                     Email = googleEmail,
                     Role = role
                 };
@@ -277,7 +283,7 @@ namespace APILayer.Controllers
             var errorDetails = result.Failure?.Message;
             return Unauthorized($"Google authentication failed. {errorDetails}");
         }
-
+        
         [HttpGet("signin-facebook")]
         public IActionResult SignInWithFacebook()
         {

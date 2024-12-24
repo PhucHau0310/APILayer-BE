@@ -4,7 +4,10 @@ using APILayer.Middlewares;
 using APILayer.Security;
 using APILayer.Services.Implementations;
 using APILayer.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -22,10 +25,19 @@ builder.Services.AddSignalR();
 // Configure authentication with JWT Bearer
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    //options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = "Google";
+    //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // For JWT
+    //    //options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;    // For JWT
+    //    //options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme; // For Cookie-based sign-in
+    //    //options.DefaultChallengeScheme = "Google";
+    //     options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+
+    //options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // For JWT
+    //options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme; // For Google
+    //options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme; // For Cookie-based sign-in
+
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
 {
@@ -37,9 +49,9 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"])),
+        ValidIssuer = configuration["Jwt:Issuer"],
+        ValidAudience = configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:SecretKey"])),
         ClockSkew = TimeSpan.Zero,
         RoleClaimType = ClaimTypes.Role
     };
@@ -59,15 +71,20 @@ builder.Services.AddAuthentication(options =>
         }
     };
 })
-.AddCookie()
-.AddGoogle(options =>
+.AddCookie(options =>
 {
-    options.ClientId = "113856962829-mchf7l61opti8866cr611v2v00tcqcdj.apps.googleusercontent.com";
-    options.ClientSecret = "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";
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+})
+.AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
+{
+    options.ClientId = configuration["Google:ClientId"];
+    options.ClientSecret = configuration["Google:ClientSecret"];
+    options.SaveTokens = true;
     options.CallbackPath = "/api/Auth/google-response";
-    options.Scope.Add("email");
-    options.Scope.Add("profile");
+    //options.SaveTokens = true;
 });
+
 
 builder.Services.AddControllersWithViews();
 
@@ -76,12 +93,16 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("https://localhost:7036", "http://localhost:7036", "http://localhost:3000")
+        policy.WithOrigins("https://localhost:7036",
+                            "http://localhost:7036",
+                            "http://localhost:3000",
+                            "https://accounts.google.com") // replace with your frontend port
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
     });
 });
+
 
 // Configure authorization policies
 builder.Services.AddAuthorization(options =>
@@ -111,7 +132,6 @@ builder.Services.AddDbContext<ApplicationDbContext>
 
 // Add services to the container
 
-//builder.Services.AddControllers();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -148,13 +168,26 @@ builder.Services.AddSwaggerGen(c =>
         }
     }));
 
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+    options.Secure = CookieSecurePolicy.Always;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    //app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Layer v1");
+        c.OAuthClientId(configuration["Google:ClientId"]);
+        c.OAuthClientSecret(configuration["Google:ClientSecret"]);
+        c.OAuthUsePkce();
+    });
 }
 
 app.UseHttpsRedirection();
@@ -176,13 +209,16 @@ app.UseEndpoints(endpoints =>
     endpoints.MapHub<ChatHub>("/chathub");
     endpoints.MapHub<NotificationHub>("/notificationhub");
     endpoints.MapControllers();
+
     endpoints.MapMethods("/api/Auth/signin-google", new[] { "OPTIONS" }, context =>
     {
-        context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:5173");
-        context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:5174");
+        context.Response.Headers.Add("Access-Control-Allow-Origin", context.Request.Headers["Origin"]);
+        context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000");
+        context.Response.Headers.Add("Access-Control-Allow-Origin", "https://localhost:7036");
         context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000");
         context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
         context.Response.StatusCode = 200;
         return Task.CompletedTask;
     });

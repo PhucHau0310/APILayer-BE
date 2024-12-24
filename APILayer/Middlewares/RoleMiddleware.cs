@@ -16,7 +16,15 @@ namespace APILayer.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
+            // Skip favicon requests
             if (context.Request.Path == "/favicon.ico")
+            {
+                await _next(context);
+                return;
+            }
+
+            // Handle OPTIONS requests (CORS preflight)
+            if (context.Request.Method == "OPTIONS")
             {
                 await _next(context);
                 return;
@@ -27,6 +35,7 @@ namespace APILayer.Middlewares
 
             Console.WriteLine(Endpoints.PublicEndpoints.Any(e => path.StartsWith(e)));
 
+            // Check if it's a public endpoint
             if (Endpoints.PublicEndpoints.Any(e => path.StartsWith(e)))
             {
                 _logger.LogInformation($"Allowing access to public endpoint: {path}");
@@ -34,6 +43,7 @@ namespace APILayer.Middlewares
                 return;
             }
 
+            // Skip auth check for authentication endpoints
             if (!context.User.Identity.IsAuthenticated)
             {
                 _logger.LogWarning($"Unauthorized access attempt to: {path}");
