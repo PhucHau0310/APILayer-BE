@@ -365,3 +365,5 @@ FodyWeavers.xsd
 # Ignore appsettings.json
 **/appsettings.json
 
+**/firebaseConfig.json
+
