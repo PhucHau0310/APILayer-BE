@@ -15,7 +15,7 @@ namespace APILayer.Models.Entities
         public string? Name { get; set; }
         public string? Description { get; set; }
         public string? Category { get; set;}
-        public string? TechnicalSpecs { get; set;}
+        public string? PricingUrl { get; set;}
         public decimal BasePrice { get; set; }
         public string Status { get; set; } = "Active"; // Inactive
         public int OverallSubscription { get; set; }

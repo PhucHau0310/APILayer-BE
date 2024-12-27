@@ -11,8 +11,8 @@ namespace APILayer.Models.Entities
         [Required]
         public int ApiId { get; set; }
         [Required]
-        public string? DocContent { get; set; }
-        public string? IntegrationGuide { get; set; }
+        public string? DocumentUrl { get; set; }
+        public string? LogoUrl { get; set; }
         public string? CodeExamples { get; set; }
         public string? Status { get; set; }
 
