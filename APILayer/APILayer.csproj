@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <None Update="firebaseConfig.json">
+	  <None Include="firebaseConfig.json">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
     <PackageReference Include="FirebaseAdmin" Version="3.1.0" />

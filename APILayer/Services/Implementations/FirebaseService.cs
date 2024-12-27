@@ -71,7 +71,7 @@ namespace APILayer.Services.Implementations
                 _logger.LogError(ex, "Error initializing Firebase service");
                 throw;
             }
-           
+
         }
 
         public async Task<string> UploadFileAsync(IFormFile file, string folder)
