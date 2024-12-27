@@ -14,12 +14,14 @@ namespace APILayer.Services.Implementations
         private readonly PasswordHasher<User> _passwordHasher;
         private readonly IEmailService _emailService;
         private readonly IFirebaseService _firebaseService;
-        public UserService(ApplicationDbContext context, IEmailService emailService, IFirebaseService firebaseService)
+        private readonly ILogger<UserService> _logger;
+        public UserService(ApplicationDbContext context, IEmailService emailService, IFirebaseService firebaseService, ILogger<UserService> logger)
         {
             _context = context;
             _passwordHasher = new PasswordHasher<User>();
             _emailService = emailService;
             _firebaseService = firebaseService;
+            _logger = logger;
         }
 
         public async Task<bool> RegisterUserAsync(RegisterReq registerReq)
@@ -291,34 +293,45 @@ namespace APILayer.Services.Implementations
         {
             try
             {
+                _logger.LogInformation("Starting avatar update for user: {Username}", username);
+
                 var user = await _context.Users.SingleOrDefaultAsync(u => u.Username == username);
-
                 if (user == null)
-                    return false;
-
-                // Handle avatar upload
-                if (avatar != null)
                 {
-                    // Delete old avatar if exists
-                    if (!string.IsNullOrEmpty(user.Avatar))
+                    _logger.LogWarning("User not found: {Username}", username);
+                    return false;
+                }
+
+                _logger.LogInformation("Current avatar URL: {CurrentAvatar}", user.Avatar);
+
+                // Try to delete old avatar, but continue even if it fails
+                if (!string.IsNullOrEmpty(user.Avatar))
+                {
+                    try
                     {
                         await _firebaseService.DeleteFileAsync(user.Avatar);
                     }
-
-                    // Upload new avatar
-                    user.Avatar = await _firebaseService.UploadFileAsync(
-                        avatar,
-                        "avatars"
-                    );
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to delete old avatar, continuing with update");
+                    }
                 }
 
-                // ... existing update logic for other fields
+                if (avatar != null)
+                {
+                    _logger.LogInformation("Uploading new avatar. File size: {Size}, Content type: {ContentType}",
+                        avatar.Length, avatar.ContentType);
+                    user.Avatar = await _firebaseService.UploadFileAsync(avatar, "avatars");
+                    _logger.LogInformation("New avatar URL: {NewAvatar}", user.Avatar);
+                }
 
                 await _context.SaveChangesAsync();
+                _logger.LogInformation("Avatar update completed successfully");
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Error updating avatar for user {Username}", username);
                 return false;
             }
         }

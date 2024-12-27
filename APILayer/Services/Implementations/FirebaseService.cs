@@ -11,41 +11,67 @@ namespace APILayer.Services.Implementations
     {
         private readonly StorageClient _storageClient;
         private readonly string _bucketName;
+        private readonly ILogger<FirebaseService> _logger;
 
-        public FirebaseService(IConfiguration configuration)
+        public FirebaseService(IConfiguration configuration, ILogger<FirebaseService> logger)
         {
-            // Get the Firebase section first
-            var firebaseSection = configuration.GetSection("Firebase");
-            if (!firebaseSection.Exists())
+            _logger = logger;
+
+            try
             {
-                throw new ArgumentException("Firebase configuration section not found");
-            }
-
-            var credentialsPath = firebaseSection.GetValue<string>("Credentials");
-            if (string.IsNullOrEmpty(credentialsPath))
-            {
-                throw new ArgumentException("Firebase credentials path is missing in configuration.");
-            }
-
-            credentialsPath = Path.Combine(AppContext.BaseDirectory, credentialsPath);
-
-            if (!File.Exists(credentialsPath))
-            {
-                throw new FileNotFoundException($"Firebase credentials file not found at path: {credentialsPath}");
-            }
-
-            var credential = GoogleCredential.FromFile(credentialsPath);
-
-            if (FirebaseApp.DefaultInstance == null)
-            {
-                FirebaseApp.Create(new AppOptions
+                // Get the Firebase section first
+                var firebaseSection = configuration.GetSection("Firebase");
+                if (!firebaseSection.Exists())
                 {
-                    Credential = credential
-                });
-            }
+                    _logger.LogError("Firebase configuration section not found");
+                    throw new ArgumentException("Firebase configuration section not found");
+                }
 
-            _storageClient = StorageClient.Create(credential);
-            _bucketName = configuration["Firebase:StorageBucket"];
+                var credentialsPath = firebaseSection.GetValue<string>("Credentials");
+                if (string.IsNullOrEmpty(credentialsPath))
+                {
+                    _logger.LogError("Firebase credentials path is missing in configuration");
+                    throw new ArgumentException("Firebase credentials path is missing in configuration.");
+                }
+
+                credentialsPath = Path.Combine(AppContext.BaseDirectory, credentialsPath);
+                _logger.LogInformation("Loading Firebase credentials from: {Path}", credentialsPath);
+
+                if (!File.Exists(credentialsPath))
+                {
+                    _logger.LogError("Firebase credentials file not found at: {Path}", credentialsPath);
+                    throw new FileNotFoundException($"Firebase credentials file not found at path: {credentialsPath}");
+                }
+
+                var credential = GoogleCredential.FromFile(credentialsPath);
+                _logger.LogInformation("Successfully loaded Firebase credentials");
+
+                if (FirebaseApp.DefaultInstance == null)
+                {
+                    FirebaseApp.Create(new AppOptions
+                    {
+                        Credential = credential
+                    });
+                    _logger.LogInformation("Created new Firebase App instance");
+                }
+
+                _storageClient = StorageClient.Create(credential);
+                _bucketName = configuration["Firebase:StorageBucket"];
+
+                if (string.IsNullOrEmpty(_bucketName))
+                {
+                    _logger.LogError("Firebase storage bucket name is missing in configuration");
+                    throw new ArgumentException("Firebase storage bucket name is missing in configuration");
+                }
+
+                _logger.LogInformation("Firebase service initialized successfully with bucket: {BucketName}", _bucketName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error initializing Firebase service");
+                throw;
+            }
+           
         }
 
         public async Task<string> UploadFileAsync(IFormFile file, string folder)
@@ -79,16 +105,23 @@ namespace APILayer.Services.Implementations
         {
             try
             {
+                _logger.LogInformation("Attempting to delete file: {FileUrl}", fileUrl);
+
                 // Extract object name from URL
                 var uri = new Uri(fileUrl);
                 var objectName = uri.LocalPath.TrimStart('/');
                 objectName = objectName.Substring(objectName.IndexOf('/') + 1);
 
+                _logger.LogInformation("Extracted object name: {ObjectName}", objectName);
+
                 // Delete from Firebase Storage  
                 await _storageClient.DeleteObjectAsync(_bucketName, objectName);
+
+                _logger.LogInformation("Successfully deleted file");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "File deletion failed");
                 throw new Exception("File deletion failed", ex);
             }
         }

@@ -310,7 +310,7 @@ namespace APILayer.Controllers
                     return NotFound(new Response<string>
                     {
                         Success = false,
-                        Message = $"Failed to update user with username {username}. User not found or email already exists.",
+                        Message = $"Failed to update user with username {username}. User not found.",
                         Data = null
                     });
                 }
