@@ -15,6 +15,7 @@ namespace APILayer.Services.Interfaces
         Task<User> GetUserById(int userId);
         Task<User> GetUserByUsername(string username);
         Task<User> GetUserByUsernameAsync(string username);
+        Task<bool> UpdateAvaUserByUsername(string username, IFormFile avatar);
         List<User> GetUsers();
         bool DeleteUserById(int userId);
         Task<User> GetOrCreateUserFromGoogleTokenAsync(string email);

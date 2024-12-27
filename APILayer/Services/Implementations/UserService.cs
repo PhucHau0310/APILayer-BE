@@ -13,11 +13,13 @@ namespace APILayer.Services.Implementations
         private readonly ApplicationDbContext _context;
         private readonly PasswordHasher<User> _passwordHasher;
         private readonly IEmailService _emailService;
-        public UserService(ApplicationDbContext context, IEmailService emailService)
+        private readonly IFirebaseService _firebaseService;
+        public UserService(ApplicationDbContext context, IEmailService emailService, IFirebaseService firebaseService)
         {
             _context = context;
             _passwordHasher = new PasswordHasher<User>();
             _emailService = emailService;
+            _firebaseService = firebaseService;
         }
 
         public async Task<bool> RegisterUserAsync(RegisterReq registerReq)
@@ -230,11 +232,24 @@ namespace APILayer.Services.Implementations
 
         public async Task<User> GetUserByUsernameAsync(string username)
         {
-            return await _context.Users.Include(u => u.FAQs)
-                                       .Include(u => u.Reviews)
-                                       .Include(u => u.Payments)
-                                       .Include(u => u.UserSubscriptions)
-                                       .FirstOrDefaultAsync(u => u.Username == username);
+            var user = await _context.Users
+                            .Include(u => u.FAQs)
+                            .Include(u => u.Reviews)
+                            .Include(u => u.Payments)
+                            .Include(u => u.UserSubscriptions)
+                            .FirstOrDefaultAsync(u => u.Username == username);
+
+            //if (user != null && !string.IsNullOrEmpty(user.Avatar))
+            //{
+            //    user.Avatar = await _firebaseService.GetFileUrlAsync(user.Avatar);
+            //}
+
+            return user;
+            //return await _context.Users.Include(u => u.FAQs)
+            //                           .Include(u => u.Reviews)
+            //                           .Include(u => u.Payments)
+            //                           .Include(u => u.UserSubscriptions)
+            //                           .FirstOrDefaultAsync(u => u.Username == username);
         }
 
         public List<User> GetUsers()
@@ -270,6 +285,42 @@ namespace APILayer.Services.Implementations
                 await _context.SaveChangesAsync();
             }
             return user;
+        }
+
+        public async Task<bool> UpdateAvaUserByUsername(string username, IFormFile avatar)
+        {
+            try
+            {
+                var user = await _context.Users.SingleOrDefaultAsync(u => u.Username == username);
+
+                if (user == null)
+                    return false;
+
+                // Handle avatar upload
+                if (avatar != null)
+                {
+                    // Delete old avatar if exists
+                    if (!string.IsNullOrEmpty(user.Avatar))
+                    {
+                        await _firebaseService.DeleteFileAsync(user.Avatar);
+                    }
+
+                    // Upload new avatar
+                    user.Avatar = await _firebaseService.UploadFileAsync(
+                        avatar,
+                        "avatars"
+                    );
+                }
+
+                // ... existing update logic for other fields
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }

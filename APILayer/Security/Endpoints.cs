@@ -9,16 +9,19 @@
             "/api/auth/register",
             "/api/auth/confirm-email",
             "/api/auth/refresh-token",
-            "/api/auth/signin-google",
-            "/api/auth/google-response",
-            "/signin-google",  // Add this
+
+            // OAuth
+            "/signin-google",
             "/google-response",
+            "/signin-facebook",
+            "/facebook-response",
 
             // UserController
             "/api/user/forgot-password",
             "/api/user/verify-code",
             "/api/user/reset-password",
             "/api/user/get-user-by-name",
+            "/api/user/update-avatar-user",
 
             // ChatController
             "/api/chat/history",

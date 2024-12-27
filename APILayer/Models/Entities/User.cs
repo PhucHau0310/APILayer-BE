@@ -18,6 +18,7 @@ namespace APILayer.Models.Entities
         [Required]
         [MaxLength(250)]
         public string? HashedPassword { get; set;}
+        public string? Avatar { get; set;}
         public string Role { get; set; } = "Customer"; // Provider, Admin
         public bool IsEmailConfirmed { get; set; } = false;
         public string? EmailConfirmationToken { get; set; }

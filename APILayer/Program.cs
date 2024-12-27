@@ -22,22 +22,28 @@ var configuration = builder.Configuration;
 // Add SignalR service
 builder.Services.AddSignalR();
 
+// Configure CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.WithOrigins("https://localhost:7036",
+                            "http://localhost:7036",
+                            "http://localhost:3000",
+                            "https://accounts.google.com") // replace with your frontend port
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
 // Configure authentication with JWT Bearer
 builder.Services.AddAuthentication(options =>
 {
-    //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // For JWT
-    //    //options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;    // For JWT
-    //    //options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme; // For Cookie-based sign-in
-    //    //options.DefaultChallengeScheme = "Google";
-    //     options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // For JWT
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;    // For JWT
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme; // For Cookie-based sign-in
 
-    //options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // For JWT
-    //options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme; // For Google
-    //options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme; // For Cookie-based sign-in
-
-    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
 {
@@ -71,36 +77,13 @@ builder.Services.AddAuthentication(options =>
         }
     };
 })
-.AddCookie(options =>
-{
-    options.Cookie.SameSite = SameSiteMode.Lax;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-})
+.AddCookie()
 .AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
 {
     options.ClientId = configuration["Google:ClientId"];
     options.ClientSecret = configuration["Google:ClientSecret"];
+    options.CallbackPath = "/google-response";
     options.SaveTokens = true;
-    options.CallbackPath = "/api/Auth/google-response";
-    //options.SaveTokens = true;
-});
-
-
-builder.Services.AddControllersWithViews();
-
-// Configure CORS policy
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.WithOrigins("https://localhost:7036",
-                            "http://localhost:7036",
-                            "http://localhost:3000",
-                            "https://accounts.google.com") // replace with your frontend port
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
-    });
 });
 
 
@@ -125,6 +108,7 @@ builder.Services.AddScoped<IFAQService, FAQService>();
 builder.Services.AddScoped<IAPIService, APIService>();
 builder.Services.AddScoped<IFeaturedAPIService, FeaturedAPIService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
+builder.Services.AddScoped<IFirebaseService, FirebaseService>();
 
 // Configure Entity Framework
 builder.Services.AddDbContext<ApplicationDbContext>
@@ -168,29 +152,19 @@ builder.Services.AddSwaggerGen(c =>
         }
     }));
 
-builder.Services.Configure<CookiePolicyOptions>(options =>
-{
-    options.MinimumSameSitePolicy = SameSiteMode.None;
-    options.Secure = CookieSecurePolicy.Always;
-});
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    //app.UseSwaggerUI();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Layer v1");
-        c.OAuthClientId(configuration["Google:ClientId"]);
-        c.OAuthClientSecret(configuration["Google:ClientSecret"]);
-        c.OAuthUsePkce();
-    });
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
+
+// Configure cookie policy before authentication
+app.UseCookiePolicy();
 
 // Place UseCors before UseAuthentication and UseAuthorization
 app.UseCors("AllowAll");
@@ -200,8 +174,9 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+//RoleMiddleware after authentication and authorization
 app.UseMiddleware<RoleMiddleware>();
-app.UseCookiePolicy();
 
 // Use UseEndpoints to map hub and controllers
 app.UseEndpoints(endpoints =>

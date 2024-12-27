@@ -1,4 +1,5 @@
-﻿using APILayer.Models.DTOs.Res;
+﻿using APILayer.Models.DTOs.Req;
+using APILayer.Models.DTOs.Res;
 using APILayer.Models.Entities;
 using APILayer.Services.Interfaces;
 using Microsoft.AspNetCore.Identity.Data;
@@ -272,6 +273,61 @@ namespace APILayer.Controllers
                 {
                     Success = false,
                     Message = "An error occurred while processing the change pass.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        [HttpPut("update-avatar-user")]
+        public async Task<IActionResult> UpdateAvaUser(string username, IFormFile avatar)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return BadRequest(new Response<string>
+                {
+                    Success = false,
+                    Message = "Username is required.",
+                    Data = null
+                });
+            }
+
+            if (avatar == null)
+            {
+                return BadRequest(new Response<string>
+                {
+                    Success = false,
+                    Message = "File upload avatar is required.",
+                    Data = null
+                });
+            }
+
+            try
+            {
+                var result = await _userService.UpdateAvaUserByUsername(username, avatar);
+
+                if (!result)
+                {
+                    return NotFound(new Response<string>
+                    {
+                        Success = false,
+                        Message = $"Failed to update user with username {username}. User not found or email already exists.",
+                        Data = null
+                    });
+                }
+
+                return Ok(new Response<string>
+                {
+                    Success = true,
+                    Message = "User updated successfully.",
+                    Data = null
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new Response<string>
+                {
+                    Success = false,
+                    Message = "An error occurred while updating the user.",
                     Data = ex.Message
                 });
             }

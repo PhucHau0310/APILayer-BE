@@ -16,6 +16,17 @@ namespace APILayer.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
+            // Skip middleware for authentication-related paths
+            if (context.Request.Path.StartsWithSegments("/signin-google") ||
+                context.Request.Path.StartsWithSegments("/google-response") ||
+                 context.Request.Path.StartsWithSegments("/sign-facebook") ||
+                  context.Request.Path.StartsWithSegments("/facebook-response") ||
+                context.Request.Path.StartsWithSegments("/error"))
+            {
+                await _next(context);
+                return;
+            }
+
             // Skip favicon requests
             if (context.Request.Path == "/favicon.ico")
             {
