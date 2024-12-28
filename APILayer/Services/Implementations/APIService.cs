@@ -1,6 +1,8 @@
 ﻿using APILayer.Data;
+using APILayer.Models.DTOs.Req;
 using APILayer.Models.Entities;
 using APILayer.Services.Interfaces;
+using FirebaseAdmin.Messaging;
 using Microsoft.EntityFrameworkCore;
 
 namespace APILayer.Services.Implementations
@@ -31,14 +33,29 @@ namespace APILayer.Services.Implementations
                                           .FirstOrDefaultAsync(a => a.Id == id);
         }
 
-        public async Task<API> CreateAPIAsync(API api)
+        public async Task<API> CreateAPIAsync(APIReq apiReq)
         {
-            await _context.Set<API>().AddAsync(api);
+            //await _context.Set<API>().AddAsync(api);
+            var api = new API
+            {
+                OwnerId = apiReq.OwnerId,
+                Name = apiReq.Name,
+                Description = apiReq.Description,
+                Category = apiReq.Category,
+                PricingUrl = apiReq.PricingUrl,
+                BasePrice = apiReq.BasePrice,
+                Status = apiReq.Status,
+                OverallSubscription = apiReq.OverallSubscription
+            };
+
+            // Add and save to the database
+            await _context.APIs.AddAsync(api);
             await _context.SaveChangesAsync();
+
             return api;
         }
 
-        public async Task<API?> UpdateAPIAsync(int id, API updatedApi)
+        public async Task<API?> UpdateAPIAsync(int id, APIReq updatedApi)
         {
             var existingApi = await _context.Set<API>().FindAsync(id);
             if (existingApi == null)
@@ -76,14 +93,25 @@ namespace APILayer.Services.Implementations
             return await _context.Set<APIDocumentation>().FindAsync(id);
         }
 
-        public async Task<APIDocumentation> CreateDocumentationAsync(APIDocumentation documentation)
+        public async Task<APIDocumentation> CreateDocumentationAsync(APIDocsReq documentation)
         {
-            await _context.Set<APIDocumentation>().AddAsync(documentation);
+            //await _context.Set<APIDocumentation>().AddAsync(documentation);
+            var docs = new APIDocumentation
+            {
+                ApiId = documentation.ApiId,
+                CodeExamples = documentation.CodeExamples,
+                DocumentUrl = documentation.DocumentUrl,
+                LogoUrl = documentation.LogoUrl,
+                Status = documentation.Status,
+            };
+
+            await _context.APIDocumentations.AddAsync(docs);
             await _context.SaveChangesAsync();
-            return documentation;
+
+            return docs;
         }
 
-        public async Task<APIDocumentation?> UpdateDocumentationAsync(int id, APIDocumentation updatedDocumentation)
+        public async Task<APIDocumentation?> UpdateDocumentationAsync(int id, APIDocsReq updatedDocumentation)
         {
             var existingDocumentation = await _context.Set<APIDocumentation>().FindAsync(id);
             if (existingDocumentation == null)

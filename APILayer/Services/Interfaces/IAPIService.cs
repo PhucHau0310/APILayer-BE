@@ -1,4 +1,5 @@
-﻿using APILayer.Models.Entities;
+﻿using APILayer.Models.DTOs.Req;
+using APILayer.Models.Entities;
 
 namespace APILayer.Services.Interfaces
 {
@@ -6,14 +7,14 @@ namespace APILayer.Services.Interfaces
     {
         Task<IEnumerable<API>> GetAllAPIsAsync();
         Task<API?> GetAPIByIdAsync(int id);
-        Task<API> CreateAPIAsync(API api);
-        Task<API?> UpdateAPIAsync(int id, API updatedApi);
+        Task<API> CreateAPIAsync(APIReq apiReq);
+        Task<API?> UpdateAPIAsync(int id, APIReq updatedApi);
         Task<bool> DeleteAPIAsync(int id);
 
         Task<IEnumerable<APIDocumentation>> GetAllDocumentationsAsync();
         Task<APIDocumentation?> GetDocumentationByIdAsync(int id);
-        Task<APIDocumentation> CreateDocumentationAsync(APIDocumentation documentation);
-        Task<APIDocumentation?> UpdateDocumentationAsync(int id, APIDocumentation updatedDocumentation);
+        Task<APIDocumentation> CreateDocumentationAsync(APIDocsReq documentation);
+        Task<APIDocumentation?> UpdateDocumentationAsync(int id, APIDocsReq updatedDocumentation);
         Task<bool> DeleteDocumentationAsync(int id);
 
         Task<IEnumerable<APIVersion>> GetAllVersionsAsync();

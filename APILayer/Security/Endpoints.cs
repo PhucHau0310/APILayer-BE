@@ -44,6 +44,9 @@
             "/api/api/version", // Để người dùng có thể xem versions
             "/api/api/version/{id}",
 
+             "/api/api",
+             "/api/api/documentation",
+
             // SignalR
             "/chathub",
             "/chathub/negotiate",

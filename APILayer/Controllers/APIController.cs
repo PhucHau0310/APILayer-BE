@@ -1,4 +1,5 @@
-﻿using APILayer.Models.DTOs.Res;
+﻿using APILayer.Models.DTOs.Req;
+using APILayer.Models.DTOs.Res;
 using APILayer.Models.Entities;
 using APILayer.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -77,11 +78,11 @@ namespace APILayer.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Response<API>>> CreateAPI([FromBody] API api)
+        public async Task<ActionResult<Response<API>>> CreateAPI([FromBody] APIReq apiReq)
         {
             try
             {
-                var createdApi = await _apiService.CreateAPIAsync(api);
+                var createdApi = await _apiService.CreateAPIAsync(apiReq);
                 return CreatedAtAction(nameof(GetAPIById),
                     new { id = createdApi.Id },
                     new Response<API>
@@ -102,7 +103,7 @@ namespace APILayer.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Response<API>>> UpdateAPI(int id, [FromBody] API updatedApi)
+        public async Task<ActionResult<Response<API>>> UpdateAPI(int id, [FromBody] APIReq updatedApi)
         {
             try
             {
@@ -222,7 +223,7 @@ namespace APILayer.Controllers
         }
 
         [HttpPost("documentation")]
-        public async Task<ActionResult<Response<APIDocumentation>>> CreateDocumentation([FromBody] APIDocumentation documentation)
+        public async Task<ActionResult<Response<APIDocumentation>>> CreateDocumentation([FromBody] APIDocsReq documentation)
         {
             try
             {
@@ -247,7 +248,7 @@ namespace APILayer.Controllers
         }
 
         [HttpPut("documentation/{id}")]
-        public async Task<ActionResult<Response<APIDocumentation>>> UpdateDocumentation(int id, [FromBody] APIDocumentation updatedDoc)
+        public async Task<ActionResult<Response<APIDocumentation>>> UpdateDocumentation(int id, [FromBody] APIDocsReq updatedDoc)
         {
             try
             {
