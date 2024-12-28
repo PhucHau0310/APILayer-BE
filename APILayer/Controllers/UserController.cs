@@ -332,5 +332,95 @@ namespace APILayer.Controllers
                 });
             }
         }
+
+        [HttpPut("update-username")]
+        public async Task<IActionResult> UpdateUsername([FromBody] UpdateUserReq updateReq)
+        {
+            if (string.IsNullOrWhiteSpace(updateReq.Username) || string.IsNullOrWhiteSpace(updateReq.NewUsername))
+            {
+                return BadRequest(new Response<string>
+                {
+                    Success = false,
+                    Message = "Username and newUsername is required.",
+                    Data = null
+                });
+            }
+
+            try
+            {
+                var result = await _userService.UpdateUsername(updateReq.Username, updateReq.NewUsername, updateReq.CoolInfoMySelft);
+
+                if (!result)
+                {
+                    return NotFound(new Response<string>
+                    {
+                        Success = false,
+                        Message = $"Failed to update username. User not found.",
+                        Data = null
+                    });
+                }
+
+                return Ok(new Response<string>
+                {
+                    Success = true,
+                    Message = "Username updated successfully.",
+                    Data = null
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new Response<string>
+                {
+                    Success = false,
+                    Message = "An error occurred while updating the user.",
+                    Data = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangPassReq changPassReq)
+        {
+            if (string.IsNullOrWhiteSpace(changPassReq.Username))
+            {
+                return BadRequest(new Response<string>
+                {
+                    Success = false,
+                    Message = "Username is required.",
+                    Data = null
+                });
+            }
+
+            try
+            {
+                var result = await _userService.ChangePassword(changPassReq.Username, changPassReq.Password, changPassReq.NewPassword);
+
+                if (!result)
+                {
+                    return BadRequest(new Response<string>
+                    {
+                        Success = false,
+                        Message = "Failed to change password. Please check your credentials.",
+                        Data = null
+                    });
+                }
+
+                return Ok(new Response<string>
+                {
+                    Success = true,
+                    Message = "Password changed successfully.",
+                    Data = null
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new Response<string>
+                {
+                    Success = false,
+                    Message = "An error occurred while processing the request.",
+                    Data = ex.Message
+                });
+            }
+        }
     }
 }

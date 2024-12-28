@@ -20,6 +20,7 @@ namespace APILayer.Models.Entities
         public string? HashedPassword { get; set;}
         public string? Avatar { get; set;}
         public string Role { get; set; } = "Customer"; // Provider, Admin
+        public string? CoolInfoMySelft { get; set;}
         public bool IsEmailConfirmed { get; set; } = false;
         public string? EmailConfirmationToken { get; set; }
         public string? Provider { get; set; }

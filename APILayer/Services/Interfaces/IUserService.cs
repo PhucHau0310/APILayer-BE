@@ -16,11 +16,15 @@ namespace APILayer.Services.Interfaces
         Task<User> GetUserByUsername(string username);
         Task<User> GetUserByUsernameAsync(string username);
         Task<bool> UpdateAvaUserByUsername(string username, IFormFile avatar);
+        Task<bool> UpdateUsername(string username, string newUsername, string coolInfoMyselft);
         List<User> GetUsers();
         bool DeleteUserById(int userId);
         Task<User> GetOrCreateUserFromGoogleTokenAsync(string email);
         Task<bool> ForgotPassword(string mail);
         Task<bool> VerifyCode(string email, string code);
         Task<bool> ChangePass(string email, string newPass);
+
+        // ChangePass by Username
+        Task<bool> ChangePassword(string username, string currentPassword, string newPassword);
     }
 }

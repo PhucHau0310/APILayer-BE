@@ -22,6 +22,8 @@
             "/api/user/reset-password",
             "/api/user/get-user-by-name",
             "/api/user/update-avatar-user",
+            "/api/user/update-username",
+            "/api/user/change-password",
 
             // ChatController
             "/api/chat/history",

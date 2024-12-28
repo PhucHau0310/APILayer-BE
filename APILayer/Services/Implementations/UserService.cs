@@ -335,5 +335,69 @@ namespace APILayer.Services.Implementations
                 return false;
             }
         }
+
+        public async Task<bool> UpdateUsername(string username, string newUsername, string coolInfoMyselft)
+        {
+            try
+            {
+                var user = await _context.Users.SingleOrDefaultAsync(u => u.Username == username);
+                if (user == null)
+                {
+                    _logger.LogWarning("User not found: {Username}", username);
+                    return false;
+                }
+                user.Username = newUsername;
+
+                if (!string.IsNullOrEmpty(coolInfoMyselft))
+                {
+                    user.CoolInfoMySelft = coolInfoMyselft;
+                }
+
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("Username update completed successfully");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating username");
+                return false;
+            }
+        }
+
+        public async Task<bool> ChangePassword(string username, string currentPassword, string newPassword)
+        {
+            try
+            {
+                // Retrieve the user by username
+                var user = await _context.Users.SingleOrDefaultAsync(u => u.Username == username);
+                if (user == null)
+                {
+                    _logger.LogWarning("User not found: {Username}", username);
+                    return false;
+                }
+
+                // Verify the current password
+                var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(user, user.HashedPassword, currentPassword);
+                if (passwordVerificationResult != PasswordVerificationResult.Success)
+                {
+                    _logger.LogWarning("Current password is incorrect for user: {Username}", username);
+                    return false;
+                }
+
+                // Hash the new password
+                user.HashedPassword = _passwordHasher.HashPassword(user, newPassword);
+
+                // Save the changes
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("Password updated successfully for user: {Username}", username);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error changing password for user: {Username}", username);
+                return false;
+            }
+        }
+
     }
 }
