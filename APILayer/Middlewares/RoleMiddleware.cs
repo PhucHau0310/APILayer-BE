@@ -98,18 +98,18 @@ namespace APILayer.Middlewares
                 }
 
                 bool isAdminEndpoint = Endpoints.AdminEndpoints.Any(e => path.StartsWith(e));
-                bool isFreelancerEndpoint = Endpoints.CustomerEndpoints.Any(e => path.StartsWith(e));
-                bool isClientEndpoint = Endpoints.ProviderEndpoints.Any(e => path.StartsWith(e));
+                bool isCustomerEndpoint = Endpoints.CustomerEndpoints.Any(e => path.StartsWith(e));
+                bool isProviderEndpoint = Endpoints.ProviderEndpoints.Any(e => path.StartsWith(e));
 
                 bool hasAccess = false;
 
                 if (isAdminEndpoint && context.User.IsInRole("Admin"))
                     hasAccess = true;
 
-                if (isFreelancerEndpoint && context.User.IsInRole("Customer"))
+                if (isCustomerEndpoint && context.User.IsInRole("Customer"))
                     hasAccess = true;
 
-                if (isClientEndpoint && context.User.IsInRole("Provider"))
+                if (isProviderEndpoint && context.User.IsInRole("Provider"))
                     hasAccess = true;
 
                 if (!hasAccess)

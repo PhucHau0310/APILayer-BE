@@ -6,29 +6,29 @@ namespace APILayer.Security
     {
         public static readonly string[] PublicEndpoints =
         {
-            // Auth
+           // Auth Controller
             "/api/auth/login",
             "/api/auth/register",
             "/api/auth/confirm-email",
             "/api/auth/refresh-token",
 
-            // OAuth
+            // OAuth Controller
             "/signin-google",
             "/google-response",
             "/signin-facebook",
             "/facebook-response",
 
-            // User
+           // User Controller - Public Operations
             "/api/user/forgot-password",
             "/api/user/verify-code",
             "/api/user/reset-password",
 
-             // FAQ
+            // FAQ Controller - Public Operations
             "/api/faq/get-faqs",
             "/api/faq/get-faq-by-id",
             "/api/faq/get-faq-by-userId",
 
-            // API 
+            // API Controller - Public Operations
             "/api/api",
             "/api/api/documentation",
             "/api/api/version",
@@ -37,12 +37,12 @@ namespace APILayer.Security
             "/api/api/featured/{id}",
             "/api/api/featured/user/{userId}",
 
-            // Chat
+            // Chat Controller - All endpoints require authentication
             "/api/chat/history",
             "/api/chat/send",
-            "/api/chat/get-conversations/{usename}",
+            "/api/chat/get-conversations/{username}",
 
-            // Notification
+            // Notification Controller - All endpoints require authentication
             "/api/notification/send",
             "/api/notification/send-many",
             "/api/notification/{id}/read",
@@ -51,91 +51,100 @@ namespace APILayer.Security
             "/api/notification/detail/{id}",
             "/api/notification/{id}",
 
-            // SignalR
+            // SignalR Endpoints
             "/chathub",
             "/chathub/negotiate",
             "/notificationhub",
             "/notificationhub/negotiate",
 
-            // Others
+            // Additional Public Endpoints
             "/api/img",
             "/graphql",
             "/api/paypal",
+
+
+            "/api/user/get-user-by-name",
+            "/api/user/update-avatar-user",
+            "/api/user/update-username",
+            "/api/user/change-password",
+
+             "/api/faq/get-faqs",
+            "/api/faq/get-faq-by-id",
+            "/api/faq/get-faq-by-userId",
+            "/api/faq/create-faq",
+            "/api/faq/update-faq",
+            "/api/faq/delete-faq",
         };
 
         public static readonly string[] AdminEndpoints =
         {
-            // UserController
+           // User Controller - Admin Operations
             "/api/user/get-users",
             "/api/user/get-user-by-id",
             "/api/user/get-user-by-name",
             "/api/user/delete-user",
-            "/api/user/update-avatar-user",
-            "/api/user/update-username",
-            "/api/user/change-password",
 
-            // FAQ
+            // FAQ Controller - Admin Operations
             "/api/faq/create-faq",
             "/api/faq/update-faq",
             "/api/faq/delete-faq",
 
-            // API 
+            // API Controller - Admin Operations
             "/api/api/{id}",
-
-            // API Docs
             "/api/api/documentation/{id}",
-
-            // API Version
             "/api/api/version/{id}",
+
+            // Subscription Controller - Admin Operations
+            "/api/subscription/newsletter",
+            "/api/subscription/newsletter/{id}",
+            "/api/subscription/user",
+            "/api/subscription/user/{id}"
         };
 
         public static readonly string[] CustomerEndpoints =
         {
-            // User
+            // User Controller - Customer Operations
             "/api/user/get-user-by-name",
             "/api/user/update-avatar-user",
             "/api/user/update-username",
             "/api/user/change-password",
 
-            // FAQ
+            // FAQ Controller - Customer Operations
             "/api/faq/create-faq",
             "/api/faq/update-faq",
 
-            // API 
+            // API Controller - Customer Operations
             "/api/api/{id}",
-
-            // API Docs
             "/api/api/documentation/{id}",
-
-            // API Version
             "/api/api/version/{id}",
 
-            // Others
+            // Payment Related Endpoints
             "/api/stripe/create-payment-intent",
             "/api/stripe/webhook",
-            "/api/paypal/create-order",
+            "/api/paypal/create-order"
         };
 
         public static readonly string[] ProviderEndpoints =
         {
-            // User
+            // User Controller - Customer Operations
             "/api/user/get-user-by-name",
             "/api/user/update-avatar-user",
             "/api/user/update-username",
             "/api/user/change-password",
 
-            // FAQ
+            // FAQ Controller - Customer Operations
             "/api/faq/create-faq",
             "/api/faq/update-faq",
 
-            // API 
+            // API Controller - Customer Operations
             "/api/api/{id}",
-
-             // API Docs
             "/api/api/documentation/{id}",
-
-            // API Version
             "/api/api/version/{id}",
+
+            // Payment Related Endpoints
+            "/api/stripe/create-payment-intent",
+            "/api/stripe/webhook",
+            "/api/paypal/create-order"
         };
     }
 }
