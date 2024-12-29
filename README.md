@@ -35,9 +35,9 @@
   4. Integrate the API into your application.
 
 ## Technology
-- **Back-end:** .NET CORE API.
+- **Back-end:** ASP.NET CORE API.
 - **Front-end:** NEXTJS.
-- **Database:** MariaDB, MySQL.
+- **Database:** SQL SERVER.
 
 
 
