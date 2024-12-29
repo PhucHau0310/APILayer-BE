@@ -43,7 +43,7 @@
 
 ### Team Members - Instructor
 
-- **[Nguyễn Phúc HậuHậu](https://github.com/PhucHau0310)** - Project Manager/Developer  
+- **[Nguyễn Phúc Hậu](https://github.com/PhucHau0310)** - Project Manager/Developer  
     
 - **[Nguyễn Vương Ming Khôi](https://github.com/khoi1909)** -  Developer
 
