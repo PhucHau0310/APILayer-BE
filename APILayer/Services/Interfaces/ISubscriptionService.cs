@@ -1,4 +1,5 @@
-﻿using APILayer.Models.Entities;
+﻿using APILayer.Models.DTOs.Req;
+using APILayer.Models.Entities;
 
 namespace APILayer.Services.Interfaces
 {
@@ -12,8 +13,8 @@ namespace APILayer.Services.Interfaces
 
         Task<IEnumerable<UserSubscription>> GetAllUserSubscriptionsAsync();
         Task<UserSubscription> GetUserSubscriptionByIdAsync(int id);
-        Task AddUserSubscriptionAsync(UserSubscription subscription);
-        Task UpdateUserSubscriptionAsync(UserSubscription subscription);
+        Task AddUserSubscriptionAsync(UserSubsReq subscription);
+        Task UpdateUserSubscriptionAsync(UserSubsReq subscription);
         Task DeleteUserSubscriptionAsync(int id);
     }
 }

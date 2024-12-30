@@ -74,6 +74,9 @@ namespace APILayer.Security
             "/api/faq/create-faq",
             "/api/faq/update-faq",
             "/api/faq/delete-faq",
+
+            "/api/subscription/user",
+            "/api/subscription/user/{id}",
         };
 
         public static readonly string[] AdminEndpoints =
