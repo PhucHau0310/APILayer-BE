@@ -109,6 +109,7 @@ builder.Services.AddScoped<IAPIService, APIService>();
 builder.Services.AddScoped<IFeaturedAPIService, FeaturedAPIService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<IFirebaseService, FirebaseService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 
 // Configure Entity Framework
 builder.Services.AddDbContext<ApplicationDbContext>

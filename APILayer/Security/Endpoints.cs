@@ -77,6 +77,11 @@ namespace APILayer.Security
 
             "/api/subscription/user",
             "/api/subscription/user/{id}",
+
+             "/api/review",
+             "/api/review/{id}",
+             "/api/review/user/{userId}",
+             "/api/review/api/{apiId}",
         };
 
         public static readonly string[] AdminEndpoints =
