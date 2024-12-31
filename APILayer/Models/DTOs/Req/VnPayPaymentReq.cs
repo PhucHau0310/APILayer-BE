@@ -5,6 +5,6 @@
         public int UserId { get; set; }
         public int ApiId { get; set; }
         public decimal Amount { get; set; }
-        public string OrderDescription { get; set; }
+        public string? OrderDescription { get; set; }
     }
 }

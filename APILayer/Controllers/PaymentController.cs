@@ -6,6 +6,7 @@ using APILayer.Services.Implementations;
 using APILayer.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace APILayer.Controllers
 {
@@ -81,7 +82,10 @@ namespace APILayer.Controllers
             var api = await _context.APIs.FindAsync(request.ApiId);
 
             if (user == null || api == null)
+            {
+                _logger.LogWarning("User or API not found");
                 return NotFound("User or API not found");
+            }
 
             var payment = new Payment
             {
@@ -99,53 +103,52 @@ namespace APILayer.Controllers
             await _context.SaveChangesAsync();
 
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
-            var paymentUrl = _vnPayService.CreatePaymentUrl(request, ipAddress);
+            //var paymentUrl = _vnPayService.CreatePaymentUrl(request, ipAddress);
+
+            // Sử dụng payment.Id để làm OrderInfo cho VNPay
+            var paymentUrl = _vnPayService.CreatePaymentUrl(new VnPayPaymentReq
+            {
+                UserId = request.UserId,
+                ApiId = request.ApiId,
+                Amount = request.Amount,
+                OrderDescription = payment.Id.ToString() // Truyền payment.Id làm OrderInfo
+            }, ipAddress);
 
             return Ok(new { PaymentUrl = paymentUrl, PaymentId = payment.Id });
         }
 
-        //[HttpGet("vnpay-return")]
-        //public async Task<IActionResult> VnPayReturn([FromQuery] IQueryCollection collections)
-        //{
-        //    var isValidSignature = _vnPayService.ValidateCallback(collections);
-        //    if (!isValidSignature)
-        //        return BadRequest("Invalid signature");
-
-        //    var orderId = collections["vnp_TxnRef"].ToString();
-        //    var vnPayResponseCode = collections["vnp_ResponseCode"].ToString();
-
-        //    var payment = await _context.Payments.FindAsync(int.Parse(orderId));
-        //    if (payment == null) return NotFound();
-
-        //    payment.PaymentStatus = vnPayResponseCode == "00" ? "Completed" : "Failed";
-        //    await _context.SaveChangesAsync();
-
-        //    return Ok(new { Success = vnPayResponseCode == "00" });
-        //}
         [HttpGet("vnpay-return")]
         public async Task<IActionResult> VnPayReturn()
         {
             var collections = HttpContext.Request.Query; // Truy cập trực tiếp query string từ HttpContext
-            _logger.LogInformation("Data collections: {collections}", collections);
+            _logger.LogInformation("VNPay return query: {0}", collections.ToString());
 
             var isValidSignature = _vnPayService.ValidateCallback(collections);
             if (!isValidSignature)
+            {
+                _logger.LogError("Invalid VNPay signature");
                 return BadRequest("Invalid signature");
+            }
 
-            var orderId = collections["vnp_TxnRef"].ToString();
+            var orderInfo = collections["vnp_OrderInfo"].ToString();
+            if (!long.TryParse(orderInfo, out long paymentId))
+            {
+                _logger.LogError($"Invalid OrderInfo format: {orderInfo}");
+                return BadRequest("Invalid order info");
+            }
+
+            var payment = await _context.Payments.FindAsync(paymentId);
+            if (payment == null)
+            {
+                _logger.LogError("Payment not found: {0}", paymentId);
+                return NotFound($"Payment {paymentId} not found");
+            }
+
             var vnPayResponseCode = collections["vnp_ResponseCode"].ToString();
-
-            _logger.LogInformation("OrderId: {orderId}", orderId);
-
-            // Convert orderId to int
-            //if (!int.TryParse(orderId, out int paymentId))
-            //    return BadRequest("Invalid order ID");
-
-            var payment = await _context.Payments.FindAsync(long.Parse(orderId));
-            if (payment == null) return NotFound();
-
             payment.PaymentStatus = vnPayResponseCode == "00" ? "Completed" : "Failed";
+
             await _context.SaveChangesAsync();
+            _logger.LogInformation("Payment {0} status updated to {1}", paymentId, payment.PaymentStatus);
 
             return Ok(new { Success = vnPayResponseCode == "00" });
         }
