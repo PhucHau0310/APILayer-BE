@@ -82,6 +82,11 @@ namespace APILayer.Security
              "/api/review/{id}",
              "/api/review/user/{userId}",
              "/api/review/api/{apiId}",
+
+             "/api/payment/create-momo-payment",
+             "/api/payment/momo-callback",
+             "/api/payment/create-vnpay-payment",
+             "/api/payment/vnpay-return",
         };
 
         public static readonly string[] AdminEndpoints =

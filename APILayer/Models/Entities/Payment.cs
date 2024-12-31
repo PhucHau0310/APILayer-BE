@@ -7,7 +7,7 @@ namespace APILayer.Models.Entities
     public class Payment
     {
         [Key]
-        public int Id { get; set; }
+        public long Id { get; set; }
         [Required]
         public int UserId { get; set; }
         [Required]

@@ -1,4 +1,5 @@
-﻿using APILayer.Data;
+﻿using APILayer.Configurations;
+using APILayer.Data;
 using APILayer.Hubs;
 using APILayer.Middlewares;
 using APILayer.Security;
@@ -18,6 +19,20 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
+
+var momoConfig = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("momoConfig.json")
+    .Build();
+
+var vnpayConfig = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("vnpayConfig.json")
+    .Build();
+
+builder.Services.AddHttpClient();
+builder.Services.Configure<VnPayConfig>(vnpayConfig.GetSection("Vnpay"));
+builder.Services.Configure<MoMoConfig>(momoConfig.GetSection("MoMo"));
 
 // Add SignalR service
 builder.Services.AddSignalR();
@@ -110,6 +125,8 @@ builder.Services.AddScoped<IFeaturedAPIService, FeaturedAPIService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<IFirebaseService, FirebaseService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IMoMoService, MoMoService>();
+builder.Services.AddScoped<IVnPayService, VnPayService>();
 
 // Configure Entity Framework
 builder.Services.AddDbContext<ApplicationDbContext>
