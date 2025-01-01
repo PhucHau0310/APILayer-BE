@@ -5,6 +5,7 @@ using APILayer.Middlewares;
 using APILayer.Security;
 using APILayer.Services.Implementations;
 using APILayer.Services.Interfaces;
+using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -129,8 +130,22 @@ builder.Services.AddScoped<IMoMoService, MoMoService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
 
 // Configure Entity Framework
-builder.Services.AddDbContext<ApplicationDbContext>
-    (options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+//builder.Services.AddDbContext<ApplicationDbContext>
+//    (options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Configuration.AddJsonFile("secrets.json", optional: true, reloadOnChange: true);
+
+// Lấy chuỗi kết nối từ file secrets.json
+string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException("Connection string not found in secrets.json.");
+}
+
+// Thêm DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString));
 
 // Add services to the container
 
