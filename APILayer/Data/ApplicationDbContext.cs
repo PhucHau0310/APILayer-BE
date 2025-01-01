@@ -65,6 +65,9 @@ namespace APILayer.Data
             modelBuilder.Entity<Payment>()
                 .HasKey(p => p.Id);
             modelBuilder.Entity<Payment>()
+                .Property(p => p.Id)
+                .HasColumnType("bigint");
+            modelBuilder.Entity<Payment>()
                 .HasOne(p => p.User)
                 .WithMany(u => u.Payments)
                 .HasForeignKey(p => p.UserId)

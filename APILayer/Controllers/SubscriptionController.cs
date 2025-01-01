@@ -1,4 +1,5 @@
-﻿using APILayer.Models.Entities;
+﻿using APILayer.Models.DTOs.Req;
+using APILayer.Models.Entities;
 using APILayer.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -81,14 +82,14 @@ namespace APILayer.Controllers
         }
 
         [HttpPost("user")]
-        public async Task<ActionResult> AddUserSubscription([FromBody] UserSubscription subscription)
+        public async Task<ActionResult> AddUserSubscription([FromBody] UserSubsReq subscription)
         {
             await _subscriptionService.AddUserSubscriptionAsync(subscription);
             return CreatedAtAction(nameof(GetUserSubscription), new { id = subscription.Id }, subscription);
         }
 
         [HttpPut("user/{id}")]
-        public async Task<ActionResult> UpdateUserSubscription(int id, [FromBody] UserSubscription subscription)
+        public async Task<ActionResult> UpdateUserSubscription(int id, [FromBody] UserSubsReq subscription)
         {
             if (id != subscription.Id)
             {

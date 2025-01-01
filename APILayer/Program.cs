@@ -1,9 +1,11 @@
-﻿using APILayer.Data;
+﻿using APILayer.Configurations;
+using APILayer.Data;
 using APILayer.Hubs;
 using APILayer.Middlewares;
 using APILayer.Security;
 using APILayer.Services.Implementations;
 using APILayer.Services.Interfaces;
+using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -18,6 +20,20 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
+
+var momoConfig = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("momoConfig.json")
+    .Build();
+
+var vnpayConfig = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("vnpayConfig.json")
+    .Build();
+
+builder.Services.AddHttpClient();
+builder.Services.Configure<VnPayConfig>(vnpayConfig.GetSection("Vnpay"));
+builder.Services.Configure<MoMoConfig>(momoConfig.GetSection("MoMo"));
 
 // Add SignalR service
 builder.Services.AddSignalR();
@@ -109,10 +125,27 @@ builder.Services.AddScoped<IAPIService, APIService>();
 builder.Services.AddScoped<IFeaturedAPIService, FeaturedAPIService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<IFirebaseService, FirebaseService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IMoMoService, MoMoService>();
+builder.Services.AddScoped<IVnPayService, VnPayService>();
 
 // Configure Entity Framework
-builder.Services.AddDbContext<ApplicationDbContext>
-    (options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+//builder.Services.AddDbContext<ApplicationDbContext>
+//    (options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Configuration.AddJsonFile("secrets.json", optional: true, reloadOnChange: true);
+
+// Lấy chuỗi kết nối từ file secrets.json
+string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException("Connection string not found in secrets.json.");
+}
+
+// Thêm DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString));
 
 // Add services to the container
 

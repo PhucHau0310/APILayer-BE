@@ -1,4 +1,5 @@
 ﻿using APILayer.Data;
+using APILayer.Models.DTOs.Req;
 using APILayer.Models.Entities;
 using APILayer.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -59,15 +60,35 @@ namespace APILayer.Services.Implementations
             return await _context.UserSubscriptions.Include(u => u.User).Include(u => u.Api).FirstOrDefaultAsync(u => u.Id == id);
         }
 
-        public async Task AddUserSubscriptionAsync(UserSubscription subscription)
+        public async Task AddUserSubscriptionAsync(UserSubsReq subscription)
         {
-            await _context.UserSubscriptions.AddAsync(subscription);
+            var subs = new UserSubscription
+            {
+                ApiId = subscription.ApiId,
+                UserId = subscription.UserId,
+                SubscriptionType = subscription.SubscriptionType,
+                StartDate = subscription.StartDate,
+                EndDate = subscription.EndDate,
+                //PaymentStatus = subscription.PaymentStatus,
+            };
+
+            await _context.UserSubscriptions.AddAsync(subs);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateUserSubscriptionAsync(UserSubscription subscription)
+        public async Task UpdateUserSubscriptionAsync(UserSubsReq subscription)
         {
-            _context.UserSubscriptions.Update(subscription);
+            var subs = new UserSubscription
+            {
+                ApiId = subscription.ApiId,
+                UserId = subscription.UserId,
+                SubscriptionType = subscription.SubscriptionType,
+                StartDate = subscription.StartDate,
+                EndDate = subscription.EndDate,
+                //PaymentStatus = subscription.PaymentStatus,
+            };
+
+            _context.UserSubscriptions.Update(subs);
             await _context.SaveChangesAsync();
         }
 

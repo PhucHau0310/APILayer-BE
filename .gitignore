@@ -367,3 +367,9 @@ FodyWeavers.xsd
 
 **/firebaseConfig.json
 
+**/momoConfig.json
+
+**/vnpayConfig.json
+
+**/secrets.json
+
