@@ -57,7 +57,7 @@ namespace APILayer.Services.Implementations
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            var confirmationLink = $"https://localhost:7036/api/Auth/confirm-email?userId={user.Id}&token={user.EmailConfirmationToken}";
+            var confirmationLink = $"https://apilayer-hvg5bbfkf5hteqc7.southeastasia-01.azurewebsites.net/api/Auth/confirm-email?userId={user.Id}&token={user.EmailConfirmationToken}";
 
             var emailBody = $@"
             <h2>Confirm your registration email</h2>
