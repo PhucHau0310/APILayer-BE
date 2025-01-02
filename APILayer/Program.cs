@@ -46,7 +46,9 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("https://localhost:7036",
                             "http://localhost:7036",
                             "http://localhost:3000",
-                            "https://accounts.google.com") // replace with your frontend port
+                            "https://accounts.google.com",
+                            "https://apilayer.khqi.site",
+                            "https://hau.io.vn") // replace with your frontend port
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();

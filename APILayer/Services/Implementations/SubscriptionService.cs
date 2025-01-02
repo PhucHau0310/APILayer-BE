@@ -52,7 +52,8 @@ namespace APILayer.Services.Implementations
         #region UserSubscription
         public async Task<IEnumerable<UserSubscription>> GetAllUserSubscriptionsAsync()
         {
-            return await _context.UserSubscriptions.Include(u => u.User).Include(u => u.Api).ToListAsync();
+            //return await _context.UserSubscriptions.Include(u => u.User).Include(u => u.Api).ToListAsync();
+            return await _context.UserSubscriptions.ToListAsync();
         }
 
         public async Task<UserSubscription> GetUserSubscriptionByIdAsync(int id)
