@@ -112,7 +112,7 @@ namespace APILayer.Security
             "/api/subscription/newsletter",
             "/api/subscription/newsletter/{id}",
             "/api/subscription/user",
-            "/api/subscription/user/{id}"
+            "/api/subscription/user/{id}",
         };
 
         public static readonly string[] CustomerEndpoints =
@@ -135,7 +135,7 @@ namespace APILayer.Security
             // Payment Related Endpoints
             "/api/stripe/create-payment-intent",
             "/api/stripe/webhook",
-            "/api/paypal/create-order"
+            "/api/paypal/create-order",
         };
 
         public static readonly string[] ProviderEndpoints =
@@ -158,7 +158,7 @@ namespace APILayer.Security
             // Payment Related Endpoints
             "/api/stripe/create-payment-intent",
             "/api/stripe/webhook",
-            "/api/paypal/create-order"
+            "/api/paypal/create-order",
         };
     }
 }

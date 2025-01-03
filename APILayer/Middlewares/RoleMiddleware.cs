@@ -34,6 +34,14 @@ namespace APILayer.Middlewares
                 return;
             }
 
+            // Skip notification requests
+            if (context.Request.Path.StartsWithSegments("/api/notification"))
+            {
+                _logger.LogInformation($"Allowing access to notification: {context.Request.Path.Value.ToLower()}");
+                await _next(context);
+                return;
+            }
+
             // Handle OPTIONS requests (CORS preflight)
             if (context.Request.Method == "OPTIONS")
             {
