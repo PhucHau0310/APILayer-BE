@@ -125,5 +125,12 @@ namespace APILayer.Services.Implementations
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<List<Notification>> GetAllNotifications()
+        {
+            return await _context.Notifications
+                .OrderByDescending(n => n.CreatedAt)
+                .ToListAsync();
+        }
     }
 }
