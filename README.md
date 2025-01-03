@@ -35,15 +35,14 @@
   4. Integrate the API into your application.
 
 ## Technology
-- **Back-end:** ASP.NET CORE API.
-- **Front-end:** NEXTJS.
-- **Database:** SQL SERVER.
+- **Back-end:** .NET CORE API.
+- **Database:** Azure
 
 
 
 ### Team Members - Instructor
 
-- **[Nguyễn Phúc Hậu](https://github.com/PhucHau0310)** - Project Manager/Developer  
+- **[Nguyễn Phúc HậuHậu](https://github.com/PhucHau0310)** - Project Leader/Developer  
     
 - **[Nguyễn Vương Ming Khôi](https://github.com/khoi1909)** -  Developer
 
