@@ -62,7 +62,7 @@ namespace APILayer.Security
             "/graphql",
             "/api/paypal",
 
-
+            "/api/user/get-users",
             "/api/user/get-user-by-name",
             "/api/user/update-avatar-user",
             "/api/user/update-username",
@@ -87,6 +87,7 @@ namespace APILayer.Security
              "/api/payment/momo-callback",
              "/api/payment/create-vnpay-payment",
              "/api/payment/vnpay-return",
+             "/api/payment/payments",
         };
 
         public static readonly string[] AdminEndpoints =
