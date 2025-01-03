@@ -152,5 +152,57 @@ namespace APILayer.Controllers
 
             return Ok(new { Success = vnPayResponseCode == "00" });
         }
+
+        [HttpGet("payments")]
+        public async Task<ActionResult<Response<List<PaymentRes>>>> GetAllPayments()
+        {
+            try
+            {
+                var payments = await _context.Payments
+                    .Include(p => p.User) 
+                    .Include(p => p.Api)  
+                    .ToListAsync();
+
+                if (payments == null || !payments.Any())
+                {
+                    return Ok(new Response<List<PaymentRes>>
+                    {
+                        Success = false,
+                        Message = "Không có giao dịch nào.",
+                        Data = null
+                    });
+                }
+
+                var paymentDTOs = payments.Select(p => new PaymentRes
+                {
+                    Id = p.Id,
+                    UserId = p.UserId,
+                    ApiId = p.ApiId,
+                    Amount = p.Amount,
+                    PaymentMethod = p.PaymentMethod,
+                    PaymentStatus = p.PaymentStatus,
+                    PaymentDate = p.PaymentDate,
+                    UserName = p.User.Username,
+                    ApiName = p.Api.Name
+                }).ToList();
+
+                return Ok(new Response<List<PaymentRes>>
+                {
+                    Success = true,
+                    Message = "Lấy danh sách giao dịch thành công.",
+                    Data = paymentDTOs
+                });
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi và trả về thông báo lỗi
+                return StatusCode(500, new Response<List<PaymentRes>>
+                {
+                    Success = false,
+                    Message = $"Lỗi khi lấy danh sách giao dịch: {ex.Message}",
+                    Data = null
+                });
+            }
+        }
     }
 }

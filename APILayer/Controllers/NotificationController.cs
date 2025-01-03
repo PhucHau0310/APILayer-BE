@@ -16,6 +16,14 @@ namespace APILayer.Controllers
             _notificationService = notificationService;
         }
 
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllNotifications()
+        {
+            var notifications = await _notificationService.GetAllNotifications();
+            return Ok(notifications);
+        }
+
+
         [HttpPost("send")]
         public async Task<IActionResult> SendNotification([FromBody] NotificationReq request)
         {
